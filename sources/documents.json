@@ -1,0 +1,58 @@
+{
+  "page_source": "https://www.prilly.ch/ville-administration/finances-impots/budgets-comptes",
+  "documents": [
+    {
+      "id": "budget-2023",
+      "fichier": "budget-2023.pdf",
+      "type": "budget",
+      "annee": 2023,
+      "titre": "Budget 2023 (préavis de la Municipalité)",
+      "url": "https://www.prilly.ch/fileadmin/ville_de_prilly/FIN/A_trier/Comptes_Communaux/VilleDePrillyBudget2023.pdf",
+      "colonnes": ["projet:2023", "budget:2022", "comptes:2021"]
+    },
+    {
+      "id": "budget-2024",
+      "fichier": "budget-2024.pdf",
+      "type": "budget",
+      "annee": 2024,
+      "titre": "Budget 2024 (préavis 20-2023 de la Municipalité)",
+      "url": "https://www.prilly.ch/fileadmin/ville_de_prilly/FIN/A_trier/Comptes_Communaux/VilleDePrillyBudget2024.pdf",
+      "colonnes": ["projet:2024", "budget:2023", "comptes:2022"]
+    },
+    {
+      "id": "budget-2025",
+      "fichier": "budget-2025.pdf",
+      "type": "budget",
+      "annee": 2025,
+      "titre": "Budget 2025, version 2 (préavis 02-2025 de la Municipalité)",
+      "url": "https://www.prilly.ch/fileadmin/ville_de_prilly/FIN/A_trier/Comptes_Communaux/VilleDePrillyBudget2025.pdf",
+      "colonnes": ["projet:2025", "budget:2024", "comptes:2023"],
+      "note": "Deuxième version du budget 2025, présentée après les amendements du Conseil communal du 9 décembre 2024 sur la première version."
+    },
+    {
+      "id": "comptes-2025",
+      "fichier": "comptes-2025.pdf",
+      "type": "comptes",
+      "annee": 2025,
+      "titre": "États financiers 2025 (préavis 17-2026)",
+      "url": "https://www.prilly.ch/fileadmin/ville_de_prilly/FIN/%C3%89tats_financiers/2025/Ville_de_Prilly_-_Etats_financiers_2025_-_Pr%C3%A9avis_17-2026_sign%C3%A9.pdf",
+      "colonnes": ["comptes:2025", "budget:2025", "comptes:2024"]
+    }
+  ],
+  "documents_de_controle": [
+    {
+      "id": "budget-2024-amende",
+      "fichier": "budget-2024-amende.pdf",
+      "titre": "Budget 2024 amendé par le Conseil communal le 11 décembre 2023, annexes 10 et 11 (document scanné)",
+      "url": "https://www.prilly.ch/fileadmin/ville_de_prilly/FIN/A_trier/Comptes_Communaux/Budget_communal_2024_ammende_annexes_10_et_11.pdf",
+      "controles": {"budget:2024": {"charges": 79833180.12, "revenus": 73529024.12, "resultat": 6304156.00}}
+    },
+    {
+      "id": "budget-2025-amende",
+      "fichier": "budget-2025-amende.pdf",
+      "titre": "Budget 2025 amendé par le Conseil communal, annexes 10, 11 et 12 (document scanné)",
+      "url": "https://www.prilly.ch/fileadmin/ville_de_prilly/FIN/A_trier/Comptes_Communaux/Budget_communal_2025-_amende_annexes_10_11_12.pdf",
+      "controles": {"budget:2025": {"charges": 78218085.00, "revenus": 73645085.00, "resultat": 4573000.00}}
+    }
+  ]
+}

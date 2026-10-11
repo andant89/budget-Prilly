@@ -1,0 +1,581 @@
+<title>Budget de Prilly</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap">
+<style>
+:root{
+  --bg:#f3f4f6; --surface:#fcfcfd; --surface-2:#e9ecf1; --fg:#121722; --fg-2:#4a5262; --muted:#7a8394;
+  --line:#dce0e7; --axis:#c1c8d3; --accent:#1d5a8e; --accent-ink:#ffffff; --accent-soft:#dde8f3;
+  --up:#c8581c; --down:#2a78d6;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4; --s6:#008300; --s7:#4a3aa7; --s8:#e34948; --s9:#9a9f99;
+  --cC:#1d5a8e; --cB:#e07a2e; --cP:#9a9f99;
+  --shadow:0 1px 2px rgba(18,23,34,.06),0 8px 24px rgba(18,23,34,.08);
+  --f-display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:6px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1218; --surface:#161a22; --surface-2:#1f2430; --fg:#eef0f4; --fg-2:#b9c0cc; --muted:#848c99;
+  --line:#28303c; --axis:#3a4452; --accent:#6fa8dc; --accent-ink:#0b1018; --accent-soft:#1b2a3c;
+  --up:#e27a3e; --down:#3987e5;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#008300; --s7:#9085e9; --s8:#e66767; --s9:#6f7670;
+  --cC:#6fa8dc; --cB:#e8914f; --cP:#7d848f;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1218; --surface:#161a22; --surface-2:#1f2430; --fg:#eef0f4; --fg-2:#b9c0cc; --muted:#848c99;
+  --line:#28303c; --axis:#3a4452; --accent:#6fa8dc; --accent-ink:#0b1018; --accent-soft:#1b2a3c;
+  --up:#e27a3e; --down:#3987e5;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#008300; --s7:#9085e9; --s8:#e66767; --s9:#6f7670;
+  --cC:#6fa8dc; --cB:#e8914f; --cP:#7d848f;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35); color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:1200px;margin:0 auto;padding-inline:20px;padding-block:0 64px}
+@media (max-width:520px){.wrap{padding-inline:16px}}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;letter-spacing:-.01em}
+.num{font-variant-numeric:tabular-nums}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mast{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 32px;padding-block:28px 18px}
+.mast h1{font-size:clamp(28px,4.4vw,44px);font-weight:800;font-stretch:78%;line-height:1;text-transform:uppercase}
+.mast h1 span{color:var(--accent)}
+.mast p{margin:6px 0 0;color:var(--fg-2);max-width:62ch}
+.stamp{font-family:var(--f-display);font-stretch:70%;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-2);border:1px solid var(--axis);padding:6px 10px;border-radius:3px}
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line);display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;margin-inline:-4px;padding-inline:4px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{background:none;border:0;padding:12px 13px 10px;cursor:pointer;color:var(--fg-2);font-family:var(--f-display);font-stretch:85%;font-weight:600;font-size:14px;letter-spacing:.02em;border-bottom:3px solid transparent;white-space:nowrap}
+.tab:hover{color:var(--fg)}
+.tab[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--accent)}
+.tabgrp{align-self:center;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:12px 4px 10px 12px;white-space:nowrap}
+.tabgrp:first-child{padding-left:4px}
+.panel{padding-top:22px}
+[hidden]{display:none!important}
+.lede{color:var(--fg-2);max-width:72ch;margin:0 0 18px}
+.sec{margin-top:30px}
+.sec-h{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 20px;margin-bottom:12px}
+.sec-h h2{font-size:21px;font-weight:700;font-stretch:90%}
+.sec-h p{margin:0;color:var(--muted);font-size:13.5px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+@media (max-width:760px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi{background:var(--surface);padding:14px 16px 13px;min-width:0}
+.kpi .k{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.kpi .v{font-family:var(--f-display);font-size:25px;font-weight:700;font-stretch:82%;line-height:1.15;margin-top:4px;overflow-wrap:anywhere}
+.kpi .s{font-size:12.5px;color:var(--fg-2)}
+.controls{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin-bottom:12px}
+.seg{display:inline-flex;border:1px solid var(--axis);border-radius:5px;overflow:hidden;max-width:100%;flex-wrap:wrap}
+.seg button{background:var(--surface);border:0;padding:6px 11px;cursor:pointer;font-size:13.5px;color:var(--fg-2)}
+.seg button+button{border-left:1px solid var(--axis)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);font-weight:600}
+select,input[type=search]{background:var(--surface);border:1px solid var(--axis);border-radius:5px;padding:6px 9px;font-size:14px;max-width:100%}
+input[type=search]{min-width:0;width:min(360px,100%)}
+label.ctl{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--fg-2);max-width:100%;min-width:0}
+label.ctl select{min-width:0;flex:1 1 auto;width:100%}
+.note{font-size:12.5px;color:var(--muted);margin-top:8px}
+.crumbs{display:flex;flex-wrap:wrap;gap:4px;align-items:center;font-size:14px;margin-bottom:10px;min-height:30px}
+.crumbs button{background:none;border:0;padding:3px 4px;cursor:pointer;color:var(--accent);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.crumbs span.cur{font-weight:700;padding:3px 4px}
+.crumbs .sep{color:var(--muted)}
+#tm{position:relative;width:100%;height:min(560px,80vw);min-height:340px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.tile{position:absolute;overflow:hidden;cursor:pointer;border-radius:3px;padding:6px 7px;line-height:1.2;color:#fff;transition:filter .12s}
+.tile:hover{filter:brightness(1.08) saturate(1.05)}
+.tile .tn{font-weight:600;font-size:13px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.tile .tv{font-size:12px;opacity:.9;font-variant-numeric:tabular-nums}
+#tip{position:fixed;z-index:60;pointer-events:none;background:var(--surface);color:var(--fg);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:6px;padding:9px 11px;font-size:13px;max-width:300px;opacity:0;transition:opacity .08s}
+#tip.on{opacity:1}
+#tip b{display:block;font-weight:700;margin-bottom:3px}
+#tip .row{display:flex;justify-content:space-between;gap:14px;font-variant-numeric:tabular-nums}
+#tip .row span:first-child{color:var(--fg-2)}
+.tblwrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+table.data{border-collapse:collapse;width:100%;min-width:720px;font-size:13.5px}
+table.data th{position:sticky;top:0;background:var(--surface-2);text-align:left;font-weight:600;font-size:12px;letter-spacing:.03em;color:var(--fg-2);padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+table.data th.r,table.data td.r{text-align:right;white-space:nowrap}
+table.data td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top;font-variant-numeric:tabular-nums}
+table.data tbody tr.clk{cursor:pointer}
+table.data tbody tr.clk:hover{background:var(--surface-2)}
+table.data td:first-child{min-width:170px}
+table.data tr.tot td{font-weight:700;background:var(--surface-2)}
+.code{font-family:var(--f-display);font-stretch:75%;color:var(--muted);font-size:12.5px;letter-spacing:.03em}
+.chip{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:1px 6px;border-radius:3px;margin-left:6px;vertical-align:1px;background:var(--accent-soft);color:var(--accent)}
+.more{margin-top:10px;display:flex;gap:12px;align-items:center;color:var(--fg-2);font-size:13.5px;flex-wrap:wrap}
+.btn{background:var(--surface);border:1px solid var(--axis);border-radius:5px;padding:6px 12px;cursor:pointer;font-weight:600;font-size:13.5px}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);padding:10px 16px}
+.btn.primary:hover{color:var(--accent-ink);filter:brightness(1.08)}
+.div{display:grid;grid-template-columns:minmax(0,1fr);gap:4px}
+.drow{display:grid;grid-template-columns:minmax(0,38%) minmax(0,1fr) 96px;gap:10px;align-items:center;font-size:13px;cursor:pointer;padding:3px 4px;border-radius:4px}
+.drow:hover{background:var(--surface-2)}
+.drow .lab{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.drow .lab small{color:var(--muted);display:block;font-size:11.5px;overflow:hidden;text-overflow:ellipsis}
+.drow .track{position:relative;height:16px}
+.drow .track::before{content:"";position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--axis)}
+.drow .b{position:absolute;top:2px;height:12px;border-radius:0 3px 3px 0}
+.drow .b.neg{border-radius:3px 0 0 3px}
+.drow .v{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.cols2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,500px),1fr));gap:18px}
+@media (max-width:620px){.drow{grid-template-columns:minmax(0,1fr) 88px}.drow .track{grid-column:1/-1;order:3}}
+.hbs{display:grid;gap:8px}
+.hb{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,38%) 64px;gap:10px;align-items:center;font-size:13.5px}
+.hb .t{height:12px;background:var(--surface-2);border-radius:0 3px 3px 0;position:relative}
+.hb .t i{position:absolute;left:0;top:0;bottom:0;border-radius:0 3px 3px 0}
+.hb .v{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+@media (max-width:560px){.hb{grid-template-columns:minmax(0,1fr) 60px}.hb .t{grid-column:1/-1;order:3}}
+#scrim{position:fixed;inset:0;background:rgba(10,14,20,.32);z-index:40}
+#drawer{position:fixed;z-index:50;top:0;right:0;bottom:0;width:min(540px,100%);background:var(--surface);border-left:1px solid var(--line);box-shadow:var(--shadow);overflow-y:auto;padding:calc(18px + env(safe-area-inset-top,0px)) 22px calc(28px + env(safe-area-inset-bottom,0px))}
+@media (max-width:640px){#drawer{top:auto;left:0;width:100%;max-height:88%;border-left:0;border-top:1px solid var(--line);border-radius:12px 12px 0 0}}
+#drawer .x{float:right;background:var(--surface-2);border:0;width:32px;height:32px;border-radius:99px;cursor:pointer;font-size:18px;line-height:1}
+#drawer h3{font-size:21px;font-stretch:88%;margin:4px 40px 4px 0}
+#drawer .crumb{font-size:12.5px;color:var(--muted)}
+.cmt{margin-top:14px}
+.cmt h4{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 6px}
+.cmt p{margin:0 0 8px;font-size:13.5px;color:var(--fg-2)}
+.cmt p small{display:block;color:var(--muted);font-size:11.5px}
+.callout{background:var(--surface-2);border-radius:5px;padding:10px 12px;font-size:13.5px;margin-top:12px}
+ul.plain{list-style:none;margin:0;padding:0}
+ul.plain li{display:flex;justify-content:space-between;gap:14px;padding:6px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+ul.plain li>span:first-child{min-width:0;overflow-wrap:anywhere}
+ul.plain li>span:last-child{font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:600}
+footer{margin-top:44px;padding-top:14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+.hmh{font-size:clamp(24px,3.4vw,34px);font-weight:800;font-stretch:85%;margin-bottom:10px}
+.hmlead{font-size:17px;line-height:1.55;max-width:70ch;margin:0 0 16px}
+.hmsearch{display:flex;gap:8px;flex-wrap:wrap;max-width:720px}
+.hmsearch input{flex:1 1 240px;min-width:0;font-size:16px;padding:10px 12px;border:1px solid var(--axis);border-radius:6px;background:var(--surface)}
+.hmchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.hmchip{background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:4px 11px;font-size:13px;cursor:pointer;color:var(--fg-2)}
+.hmchip:hover{border-color:var(--accent);color:var(--accent)}
+.neutral{font-size:13px;color:var(--muted);margin:14px 0 0}
+.qgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:10px}
+.qcard{all:unset;box-sizing:border-box;cursor:pointer;display:grid;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:13px 14px}
+.qcard:hover{border-color:var(--accent)}
+.qcard:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.qq{font-weight:600;font-size:14px}
+.qa{font-family:var(--f-display);font-stretch:85%;font-weight:700;font-size:19px;color:var(--accent)}
+.qs{font-size:12px;color:var(--muted)}
+.prose{max-width:72ch}
+.prose h2{font-size:26px;font-stretch:85%;margin-bottom:6px}
+.prose h3{font-size:17px;margin:22px 0 4px}
+.prose p,.prose li{line-height:1.6}
+.prose p{margin:0 0 10px}
+.glossary{display:grid;grid-template-columns:minmax(0,190px) minmax(0,1fr);gap:8px 16px;margin:8px 0 0}
+.glossary dt{font-weight:700}
+.glossary dd{margin:0;color:var(--fg-2)}
+@media (max-width:560px){.glossary{grid-template-columns:1fr}.glossary dd{margin-bottom:8px}}
+.gl{border-bottom:1px dotted var(--fg-2);cursor:help}
+.lnk{all:unset;cursor:pointer;color:var(--accent);text-decoration:underline;text-underline-offset:2px}
+.lnk:focus-visible{outline:2px solid var(--accent)}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px;border:1px solid var(--line);background:var(--surface);color:var(--fg-2)}
+.badge::before{content:"";width:8px;height:8px;border-radius:99px;background:var(--b,var(--muted))}
+.badge.ok{--b:#0ca30c}.badge.info{--b:var(--s1)}.badge.warn{--b:#fab219}
+.lecture{font-size:13.5px;background:var(--surface-2);border-radius:5px;padding:9px 12px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:12.5px;color:var(--fg-2)}
+.legend i{display:inline-block;width:14px;height:3px;margin-right:6px;vertical-align:3px;border-radius:2px}
+.legend i.dash{background:repeating-linear-gradient(90deg,currentColor 0 4px,transparent 4px 7px)!important}
+svg text{fill:var(--fg-2);font-size:11.5px;font-family:var(--f-body)}
+svg .ax line,svg .ax path{stroke:var(--axis)}
+svg .grid line{stroke:var(--line)}
+.chart{width:100%;overflow-x:auto}
+.chart svg{display:block;width:100%;height:auto}
+.hit rect{fill:var(--fg);opacity:0}
+.hit:hover rect{opacity:.05}
+</style>
+
+<div class="wrap">
+<header class="mast">
+  <div>
+    <h1>Budget de <span>Prilly</span></h1>
+    <p>Les budgets et les comptes de la Ville de Prilly, ligne par ligne, tels que publiés par la commune. Projet indépendant, sans lien avec l'administration communale.</p>
+  </div>
+  <div class="stamp" id="stamp"></div>
+</header>
+<nav class="tabs" role="tablist">
+  <span class="tabgrp">Comprendre</span>
+  <button class="tab" role="tab" id="t-ac" aria-controls="p-ac">Accueil</button>
+  <button class="tab" role="tab" id="t-ex" aria-controls="p-ex">Explorer</button>
+  <button class="tab" role="tab" id="t-re" aria-controls="p-re">Rechercher</button>
+  <button class="tab" role="tab" id="t-gu" aria-controls="p-gu">Comment lire</button>
+  <span class="tabgrp">Approfondir</span>
+  <button class="tab" role="tab" id="t-ov" aria-controls="p-ov">Vue d'ensemble</button>
+  <button class="tab" role="tab" id="t-ev" aria-controls="p-ev">Évolutions</button>
+  <button class="tab" role="tab" id="t-bc" aria-controls="p-bc">Budget et comptes</button>
+  <button class="tab" role="tab" id="t-am" aria-controls="p-am">Amendements</button>
+  <button class="tab" role="tab" id="t-fs" aria-controls="p-fs">Fiche service</button>
+</nav>
+
+<!-- ACCUEIL -->
+<section class="panel" id="p-ac" role="tabpanel" hidden>
+  <h2 class="hmh">Où va l'argent de la commune&nbsp;?</h2>
+  <p class="hmlead" id="acLead"></p>
+  <div class="hmsearch"><input type="search" id="acQ" placeholder="Chercher : école, piscine, police, déchets…" aria-label="Chercher une ligne du budget"><button class="btn primary" id="acGo">Chercher</button></div>
+  <div class="hmchips" id="acChips"></div>
+  <div class="sec"><div class="kpis" id="acKpis"></div></div>
+  <div class="sec cols2">
+    <div><div class="sec-h"><h2 id="acDepH"></h2></div><div class="card"><div class="hbs" id="acDep"></div><p class="note">Par direction municipale, hors <span class="gl" data-g="imputations">imputations internes</span> ; les <span class="gl" data-g="fonds">attributions aux fonds</span> sont comprises.</p></div></div>
+    <div><div class="sec-h"><h2 id="acRecH"></h2></div><div class="card"><div class="hbs" id="acRec"></div><p class="note">Par nature de revenu, hors imputations internes ; les prélèvements sur les fonds sont compris.</p></div></div>
+  </div>
+  <div class="sec"><div class="sec-h"><h2>Questions fréquentes</h2><p>Cliquez pour voir le détail.</p></div><div class="qgrid" id="acQs"></div></div>
+  <p class="neutral">Ce site présente les chiffres publiés par la commune sans les juger. Les écarts et évolutions sont décrits, pas interprétés : à chacun de se faire son avis.</p>
+</section>
+
+<!-- EXPLORER -->
+<section class="panel" id="p-ex" role="tabpanel" hidden>
+  <p class="lede">Chaque rectangle est proportionnel au montant. Cliquez pour descendre d'un niveau : direction, groupe de services, service, puis ligne.</p>
+  <div class="controls">
+    <label class="ctl">Année <select id="exSer"></select></label>
+    <div class="seg" id="exSens"><button data-v="charge" aria-pressed="true">Charges</button><button data-v="revenu" aria-pressed="false">Revenus</button></div>
+    <label class="ctl"><input type="checkbox" id="exImp"> Inclure les imputations internes</label>
+  </div>
+  <div class="crumbs" id="exCrumbs"></div>
+  <div id="tm"></div>
+  <p class="note" id="exNote"></p>
+</section>
+
+<!-- RECHERCHER -->
+<section class="panel" id="p-re" role="tabpanel" hidden>
+  <div class="controls">
+    <input type="search" id="reQ" placeholder="Mot, numéro de compte ou de service…" aria-label="Rechercher">
+    <select id="reDir" aria-label="Direction"><option value="">Toutes les directions</option></select>
+    <div class="seg" id="reSens"><button data-v="" aria-pressed="true">Tout</button><button data-v="charge" aria-pressed="false">Charges</button><button data-v="revenu" aria-pressed="false">Revenus</button></div>
+    <label class="ctl"><input type="checkbox" id="reCom"> Chercher aussi dans les commentaires</label>
+  </div>
+  <p class="note" id="reInfo"></p>
+  <div class="tblwrap"><table class="data" id="reT"></table></div>
+  <div class="more" id="reMore"></div>
+</section>
+
+<!-- COMMENT LIRE -->
+<section class="panel prose" id="p-gu" role="tabpanel" hidden></section>
+
+<!-- VUE D'ENSEMBLE -->
+<section class="panel" id="p-ov" role="tabpanel" hidden>
+  <div class="sec-h"><h2>Charges, revenus et résultat</h2><p>En millions de francs. Survolez une année pour le détail.</p></div>
+  <div class="card"><div class="seg" id="ovWhat" style="margin-bottom:10px"><button data-v="res" aria-pressed="true">Résultat</button><button data-v="charge" aria-pressed="false">Charges</button><button data-v="revenu" aria-pressed="false">Revenus</button></div><div class="chart" id="ovChart"></div><div class="legend" id="ovLeg"></div></div>
+  <div class="sec"><div class="sec-h"><h2>Tableau des résultats</h2><p>Totaux officiels, imputations internes comprises.</p></div><div class="tblwrap"><table class="data" id="ovRes"></table></div></div>
+  <div class="sec"><div class="sec-h"><h2>Coût net par direction</h2><p>Charges moins revenus de chaque direction, hors imputations internes. Un montant négatif signifie que la direction encaisse plus qu'elle ne dépense (c'est le cas des Finances, qui reçoivent les impôts).</p></div><div class="tblwrap"><table class="data" id="ovDir"></table></div></div>
+  <div class="sec"><div class="sec-h"><h2>Charges par nature</h2><p>Hors imputations internes.</p></div><div class="tblwrap"><table class="data" id="ovNat"></table></div></div>
+</section>
+
+<!-- EVOLUTIONS -->
+<section class="panel" id="p-ev" role="tabpanel" hidden>
+  <p class="lede">Comparez deux années et voyez quelles lignes ont le plus augmenté ou diminué.</p>
+  <div class="controls">
+    <label class="ctl">De <select id="evA"></select></label>
+    <label class="ctl">à <select id="evB"></select></label>
+    <label class="ctl">Niveau <select id="evLvl"><option value="dir">Direction</option><option value="grp">Groupe de services</option><option value="sec" selected>Service</option><option value="lig">Ligne</option></select></label>
+    <div class="seg" id="evSens"><button data-v="charge" aria-pressed="true">Charges</button><button data-v="revenu" aria-pressed="false">Revenus</button><button data-v="net" aria-pressed="false">Net</button></div>
+  </div>
+  <p id="evBadge"></p>
+  <div class="cols2"><div><div class="sec-h"><h2>Plus fortes hausses</h2></div><div class="div" id="evUp"></div></div><div><div class="sec-h"><h2>Plus fortes baisses</h2></div><div class="div" id="evDn"></div></div></div>
+  <p class="note">Les lignes qui apparaissent ou disparaissent peuvent refléter un changement de numérotation (réorganisation d'un service) plutôt qu'une nouvelle dépense.</p>
+</section>
+
+<!-- BUDGET ET COMPTES -->
+<section class="panel" id="p-bc" role="tabpanel" hidden>
+  <p class="lede">Le budget est une prévision votée avant l'année ; les comptes disent ce qui a réellement été dépensé et encaissé. Cet onglet montre les écarts entre les deux.</p>
+  <div class="controls">
+    <label class="ctl">Année <select id="bcY"></select></label>
+    <label class="ctl">Niveau <select id="bcLvl"><option value="dir">Direction</option><option value="sec">Service</option><option value="lig" selected>Ligne</option></select></label>
+    <div class="seg" id="bcSens"><button data-v="charge" aria-pressed="true">Charges</button><button data-v="revenu" aria-pressed="false">Revenus</button></div>
+  </div>
+  <div class="kpis" id="bcKpis"></div>
+  <div class="sec"><div class="sec-h"><h2>Plus grands écarts</h2><p>Positif : réalisé supérieur au budget.</p></div><div class="tblwrap"><table class="data" id="bcT"></table></div><div class="more" id="bcMore"></div></div>
+</section>
+
+<!-- AMENDEMENTS -->
+<section class="panel" id="p-am" role="tabpanel" hidden>
+  <p class="lede">La Municipalité présente un projet de budget ; le Conseil communal peut le modifier avant de le voter. Cet onglet compare, ligne par ligne, le projet et le budget voté.</p>
+  <div class="controls"><label class="ctl">Année <select id="amY"></select></label></div>
+  <div class="kpis" id="amKpis"></div>
+  <p class="note" id="amNote"></p>
+  <div class="sec"><div class="tblwrap"><table class="data" id="amT"></table></div></div>
+</section>
+
+<!-- FICHE SERVICE -->
+<section class="panel" id="p-fs" role="tabpanel" hidden>
+  <div class="controls"><label class="ctl">Service <select id="fsS"></select></label></div>
+  <div class="kpis" id="fsKpis"></div>
+  <div class="sec card"><div class="chart" id="fsChart"></div><div class="legend" id="fsLeg"></div></div>
+  <div class="sec"><div class="sec-h"><h2>Lignes du service</h2><p>Cliquez une ligne pour son historique et les commentaires.</p></div><div class="tblwrap"><table class="data" id="fsT"></table></div></div>
+</section>
+
+<footer id="foot"></footer>
+</div>
+<div id="tip" role="tooltip"></div>
+<div id="scrim" hidden></div>
+<aside id="drawer" hidden aria-modal="true" role="dialog"></aside>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+const D=/*DATA*/null;
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const store=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}, load=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
+const S=D.series, SI=Object.fromEntries(S.map((s,i)=>[s.id,i])), L=D.lignes;
+const SNAME=id=>S[SI[id]].nom;
+const ofType=t=>S.filter(s=>s.type===t).sort((a,b)=>a.annee-b.annee);
+const lastOf=t=>{const a=ofType(t);return a.length?a[a.length-1].id:null};
+const LC=lastOf("C"), LB=lastOf("B"), LP=lastOf("P");
+const nf=new Intl.NumberFormat("fr-CH",{maximumFractionDigits:0}), nf2=new Intl.NumberFormat("fr-CH",{minimumFractionDigits:2,maximumFractionDigits:2});
+const chf=v=>v==null?"–":nf.format(Math.round(v)).replace(/ | /g,"'")+" fr.";
+const chf2=v=>v==null?"–":nf2.format(v).replace(/ | /g,"'");
+const mio=v=>{if(v==null)return"–";const a=Math.abs(v);if(a>=1e6)return(v/1e6).toLocaleString("fr-CH",{maximumFractionDigits:a>=1e8?0:1})+" mio";if(a>=1e3)return Math.round(v/1e3).toLocaleString("fr-CH")+" mille";return Math.round(v)+" fr."};
+const sgn=v=>(v>0?"+":"")+mio(v);
+const pct=(a,b)=>b?((a-b)/Math.abs(b)*100):null;
+const fpct=p=>p==null||!isFinite(p)?"":(p>0?"+":"")+p.toLocaleString("fr-CH",{maximumFractionDigits:1})+" %";
+const norm=s=>String(s).normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+const val=(l,sid)=>l[3][SI[sid]];
+const sensOf=l=>l[1][0]==="3"?"charge":"revenu";
+const isImp=l=>/^(39|49)/.test(l[1]);
+const secName=s=>D.sections[s]||("Service "+s);
+const grpName=g=>D.groupes[g]||("Groupe "+g);
+const dirName=d=>D.directions[d]||("Direction "+d);
+const COL=["--s1","--s2","--s3","--s4","--s5","--s7","--s8","--s6","--s9"].map(v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim());
+const dirColor=d=>COL[(+d-1)%COL.length];
+
+// ---------- glossaire ----------
+const GLOSS={
+ imputations:["Imputations internes","Facturations d'un service communal à un autre (loyers, intérêts, prestations). Elles apparaissent à la fois en charges (nature 39) et en revenus (nature 49) et s'annulent dans le total : les exclure évite de compter deux fois la même dépense."],
+ fonds:["Fonds de réserve","Argent mis de côté pour un usage futur (attribution, nature 38) ou repris pour couvrir une dépense (prélèvement, nature 48). Ce sont des écritures comptables, pas des dépenses ou recettes auprès de tiers."],
+ amortissements:["Amortissements","Part annuelle du coût d'un investissement (bâtiment, route, véhicule) inscrite dans le budget de fonctionnement pendant sa durée d'utilisation."],
+ projet:["Projet de budget","Budget proposé par la Municipalité au Conseil communal, avant d'éventuels amendements."],
+ budget:["Budget voté","Budget adopté par le Conseil communal, avec ses amendements. C'est une autorisation de dépenser et une estimation des recettes."],
+ comptes:["Comptes","Ce qui a réellement été dépensé et encaissé pendant l'année, après sa clôture."],
+ amendement:["Amendement","Modification d'une ligne du budget décidée par le Conseil communal lors du vote."],
+ resultat:["Résultat","Revenus moins charges. Négatif : excédent de charges (déficit) ; positif : excédent de revenus."],
+ facture:["Facture sociale (péréquation)","Contributions que les communes versent au Canton pour financer en commun l'action sociale et d'autres tâches, selon des règles de répartition entre communes."],
+ nature:["Nature","Type de dépense ou de recette selon le plan comptable des communes vaudoises : personnel, biens et services, subventions, impôts, etc. Indiquée par les premiers chiffres du numéro de compte."],
+};
+const g=(k,txt)=>`<span class="gl" tabindex="0" data-tip="${esc("<b>"+esc(GLOSS[k][0])+"</b>"+esc(GLOSS[k][1]))}">${txt||GLOSS[k][0].toLowerCase()}</span>`;
+
+// ---------- infobulles ----------
+const tip=$("#tip");
+function moveTip(e){const w=tip.offsetWidth,h=tip.offsetHeight;let x=e.clientX+14,y=e.clientY+14;if(x+w>innerWidth-8)x=e.clientX-w-14;if(y+h>innerHeight-8)y=e.clientY-h-14;tip.style.left=Math.max(8,x)+"px";tip.style.top=Math.max(8,y)+"px"}
+function showTip(e,html){tip.innerHTML=html;tip.classList.add("on");moveTip(e)}
+function hideTip(){tip.classList.remove("on")}
+const tipRows=(t,rows)=>"<b>"+esc(t)+"</b>"+rows.map(r=>`<div class="row"><span>${r[0]}</span><span>${r[1]}</span></div>`).join("");
+document.addEventListener("mousemove",e=>{const el=e.target.closest&&e.target.closest("[data-tip]");if(el)showTip(e,el.getAttribute("data-tip"));else if(tip.classList.contains("on")&&!e.target.closest(".tile"))hideTip()});
+document.addEventListener("focusin",e=>{const el=e.target.closest&&e.target.closest("[data-tip]");if(el){const r=el.getBoundingClientRect();showTip({clientX:r.left,clientY:r.bottom},el.getAttribute("data-tip"))}});
+document.addEventListener("focusout",hideTip);
+$$(".gl[data-g]").forEach(el=>{el.tabIndex=0;el.dataset.tip="<b>"+esc(GLOSS[el.dataset.g][0])+"</b>"+esc(GLOSS[el.dataset.g][1])});
+
+// ---------- onglets ----------
+const tabs=$$(".tab"); let curTab=null; const drawn={};
+function openTab(id){curTab=id;tabs.forEach(t=>{const on=t.id===id;t.setAttribute("aria-selected",on);$("#"+t.getAttribute("aria-controls")).hidden=!on});store("bp-tab",id);
+  try{if(window.goatcounter&&window.goatcounter.count)window.goatcounter.count({path:"/onglet/"+id.slice(2),title:$("#"+id).textContent,event:true})}catch(e){}
+  (RENDER[id]||(()=>{}))();}
+tabs.forEach(t=>t.addEventListener("click",()=>openTab(t.id)));
+function seg(id,cb){const el=$(id);el.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;el.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));cb(b.dataset.v)});return()=>el.querySelector('[aria-pressed="true"]').dataset.v}
+function fillSel(sel,opts,v){sel.innerHTML=opts.map(o=>`<option value="${esc(o[0])}">${esc(o[1])}</option>`).join("");if(v!=null)sel.value=v}
+
+// ---------- agrégats ----------
+function agg(sid,keyFn,opt={}){const m=new Map();for(const l of L){const v=val(l,sid);if(v==null)continue;if(!opt.imp&&isImp(l))continue;if(opt.sens&&sensOf(l)!==opt.sens)continue;if(opt.filter&&!opt.filter(l))continue;const k=keyFn(l);const s=opt.sens?v:(sensOf(l)==="charge"?v:-v);m.set(k,(m.get(k)||0)+s)}return m}
+function tot(sid,sens,imp=true){let s=0;for(const l of L){const v=val(l,sid);if(v==null||sensOf(l)!==sens)continue;if(!imp&&isImp(l))continue;s+=v}return s}
+const RES=Object.fromEntries(D.resultats.map(r=>[r.serie,r]));
+const keyOf={dir:l=>l[0][0],grp:l=>l[0].slice(0,2),sec:l=>l[0],lig:l=>l[0]+"|"+l[1]};
+const nameOf={dir:k=>dirName(k),grp:k=>grpName(k),sec:k=>secName(k),lig:k=>{const l=L[LIDX.get(k)];return l?l[2]:k}};
+const subOf={dir:()=>"",grp:k=>dirName(k[0]),sec:k=>grpName(k.slice(0,2)),lig:k=>secName(k.split("|")[0])};
+const LIDX=new Map(L.map((l,i)=>[l[0]+"|"+l[1],i]));
+
+// ---------- tiroir (détail d'une ligne) ----------
+function openLine(i){const l=L[i];const cm=D.commentaires[i]||[];
+  const rows=S.map(s=>[s,val(l,s.id)]).filter(r=>r[1]!=null);
+  let h=`<button class="x" aria-label="Fermer">×</button><div class="crumb">${esc(dirName(l[0][0]))} › ${esc(secName(l[0]))}</div><h3>${esc(l[2])}</h3><div class="crumb">Compte <span class="code">${l[0]}.${l[1]}</span> · ${sensOf(l)==="charge"?"charge":"revenu"} · nature ${esc(D.natures[l[1].slice(0,3)]||l[1].slice(0,3))}</div>`;
+  h+=`<div class="chart" id="drChart" style="margin-top:12px"></div><div class="legend">${legendHTML()}</div>`;
+  h+=`<div class="cmt"><h4>Tous les montants</h4><ul class="plain">${rows.map(r=>`<li><span>${esc(r[0].nom)}</span><span>${chf(r[1])}</span></li>`).join("")}</ul></div>`;
+  if(cm.length)h+=`<div class="cmt"><h4>Commentaires de la commune</h4>${cm.map(c=>`<p>${esc(c[1])}<small>${esc(D.documents[c[0]]?.titre||c[0])}</small></p>`).join("")}</div>`;
+  h+=`<div class="callout">Montants tels que publiés. Un compte peut changer de numéro ou de service d'une année à l'autre : une absence ne signifie pas forcément que la dépense a disparu.</div>`;
+  showDrawer(h);lineChart($("#drChart"),{C:seriesVals("C",s=>val(l,s)),B:seriesVals("B",s=>val(l,s)),P:seriesVals("P",s=>val(l,s))},{h:180,fmt:chf});}
+function showDrawer(h){const d=$("#drawer");d.innerHTML=h;d.hidden=false;$("#scrim").hidden=false;d.querySelector(".x").onclick=closeDrawer;d.querySelector(".x").focus()}
+function closeDrawer(){$("#drawer").hidden=true;$("#scrim").hidden=true}
+$("#scrim").onclick=closeDrawer;document.addEventListener("keydown",e=>{if(e.key==="Escape")closeDrawer()});
+
+// ---------- graphique pluriannuel ----------
+const TYPES={C:["Comptes","--cC",""],B:["Budget voté","--cB","4 3"],P:["Projet de budget","--cP","2 3"]};
+const cssv=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const legendHTML=(ks="CBP")=>[...ks].map(k=>`<span><i style="background:${cssv(TYPES[k][1])}" class="${TYPES[k][2]?"dash":""}"></i>${TYPES[k][0]}</span>`).join("");
+function seriesVals(t,f){return ofType(t).map(s=>[s.annee,f(s.id)]).filter(x=>x[1]!=null)}
+function lineChart(el,data,opt={}){const W=Math.max(300,el.clientWidth||640),H=opt.h||260,m={l:62,r:14,t:12,b:26};
+  const all=Object.values(data).flat();if(!all.length){el.innerHTML='<p class="note">Pas de montant.</p>';return}
+  const yrs=[...new Set(all.map(d=>d[0]))].sort();const x=d3.scalePoint().domain(yrs).range([m.l,W-m.r]).padding(.4);
+  let lo=d3.min(all,d=>d[1]),hi=d3.max(all,d=>d[1]);if(lo>0)lo=0;if(hi<0)hi=0;const y=d3.scaleLinear().domain([lo,hi]).nice().range([H-m.b,m.t]);
+  const f=opt.fmt||mio;let s=`<svg viewBox="0 0 ${W} ${H}" role="img">`;
+  y.ticks(5).forEach(t=>{s+=`<g class="grid"><line x1="${m.l}" x2="${W-m.r}" y1="${y(t)}" y2="${y(t)}"/></g><text x="${m.l-6}" y="${y(t)+4}" text-anchor="end">${(t/1e6).toLocaleString("fr-CH",{maximumFractionDigits:2})}</text>`});
+  if(lo<0)s+=`<line x1="${m.l}" x2="${W-m.r}" y1="${y(0)}" y2="${y(0)}" stroke="${cssv("--fg-2")}"/>`;
+  yrs.forEach(a=>{s+=`<text x="${x(a)}" y="${H-6}" text-anchor="middle">${a}</text>`});
+  for(const k of Object.keys(data)){const d=data[k];if(!d.length)continue;const c=cssv(TYPES[k][1]);
+    s+=`<path d="${d3.line().x(p=>x(p[0])).y(p=>y(p[1]))(d)}" fill="none" stroke="${c}" stroke-width="2.4" ${TYPES[k][2]?`stroke-dasharray="${TYPES[k][2]}"`:""}/>`;
+    d.forEach(p=>{s+=`<circle cx="${x(p[0])}" cy="${y(p[1])}" r="3.6" fill="${c}"/>`})}
+  const step=x.step();yrs.forEach(a=>{const rows=Object.keys(data).map(k=>{const p=data[k].find(p=>p[0]===a);return p?[TYPES[k][0],f(p[1])]:null}).filter(Boolean);
+    s+=`<g class="hit" data-tip="${esc(tipRows(String(a),rows))}"><rect x="${x(a)-step/2}" y="${m.t}" width="${step}" height="${H-m.t-m.b}"/></g>`});
+  el.innerHTML=s+"</svg>";}
+
+// ---------- barres ----------
+function hbars(el,items,opt={}){const max=d3.max(items,d=>Math.abs(d.v))||1;
+  el.innerHTML=items.map(d=>`<div class="hb" ${d.tip?`data-tip="${esc(d.tip)}"`:""}><span>${esc(d.n)}</span><span class="t"><i style="width:${Math.abs(d.v)/max*100}%;background:${d.c||"var(--accent)"}"></i></span><span class="v">${opt.fmt?opt.fmt(d.v):d.v}</span></div>`).join("")}
+function divbars(el,items,onClick){const max=d3.max(items,d=>Math.abs(d.d))||1;
+  if(!items.length){el.innerHTML='<p class="note">Aucune ligne.</p>';return}
+  el.innerHTML=items.map((d,i)=>{const w=Math.abs(d.d)/max*50;const neg=d.d<0;return `<div class="drow" data-i="${i}" data-tip="${esc(tipRows(d.n,[["Avant",chf(d.a)],["Après",chf(d.b)],["Écart",sgn(d.d)+(d.a&&d.b?" ("+fpct(pct(d.b,d.a))+")":"")]]))}"><div class="lab">${esc(d.n)}<small>${esc(d.sub||"")}</small></div><div class="track"><div class="b${neg?" neg":""}" style="${neg?`right:50%`:`left:50%`};width:${w}%;background:${neg?"var(--down)":"var(--up)"}"></div></div><div class="v">${sgn(d.d)}</div></div>`}).join("");
+  el.querySelectorAll(".drow").forEach(r=>r.onclick=()=>onClick(items[+r.dataset.i]))}
+
+// ---------- ACCUEIL ----------
+function renderAccueil(){if(drawn.ac)return;drawn.ac=1;
+  const yC=S[SI[LC]].annee;const r=RES[LC], rb=RES[LB];
+  $("#acLead").innerHTML=`En ${yC}, la commune a dépensé <b>${mio(+r.charges)}</b> de francs et encaissé <b>${mio(+r.revenus)}</b> (${g("comptes","comptes")} ${yC}). Ce site permet de retrouver chaque ligne des ${g("budget","budgets")} et des comptes publiés depuis ${ofType("C")[0].annee}, et de les comparer d'une année à l'autre.`;
+  $("#stamp").textContent=`Comptes ${ofType("C")[0].annee}–${yC} · budgets ${ofType("B")[0].annee}–${S[SI[LB]].annee}`;
+  const kp=[["Charges "+yC,mio(+r.charges),"comptes, total officiel"],["Revenus "+yC,mio(+r.revenus),"comptes, total officiel"],
+    ["Résultat "+yC,sgn(+r.resultat),(+r.resultat>=0?"excédent de revenus":"excédent de charges")],["Résultat prévu "+rb.annee,sgn(+rb.resultat),"budget voté"]];
+  $("#acKpis").innerHTML=kp.map(k=>`<div class="kpi"><div class="k">${k[0]}</div><div class="v num">${k[1]}</div><div class="s">${k[2]}</div></div>`).join("");
+  $("#acDepH").textContent=`Sur 100 francs dépensés en ${yC}`;$("#acRecH").textContent=`D'où viennent les revenus en ${yC}`;
+  const dep=agg(LC,l=>l[0][0],{sens:"charge"}), td=d3.sum([...dep.values()]);
+  hbars($("#acDep"),[...dep].sort((a,b)=>b[1]-a[1]).map(([k,v])=>({n:dirName(k),v:v/td*100,c:dirColor(k),tip:tipRows(dirName(k),[["Charges",chf(v)]])})),{fmt:v=>v.toLocaleString("fr-CH",{maximumFractionDigits:1})+" fr."});
+  const rec=agg(LC,l=>l[1].slice(0,2),{sens:"revenu"}), tr=d3.sum([...rec.values()]);
+  hbars($("#acRec"),[...rec].sort((a,b)=>b[1]-a[1]).map(([k,v])=>({n:D.natures[k]||k,v:v/tr*100,c:"var(--s3)",tip:tipRows(D.natures[k]||k,[["Revenus",chf(v)]])})),{fmt:v=>v.toLocaleString("fr-CH",{maximumFractionDigits:1})+" %"});
+  const chips=["école","piscine","police","impôts","déchets","accueil de jour","transports publics","subventions","facture sociale","salaires"];
+  $("#acChips").innerHTML=chips.map(c=>`<button class="hmchip">${c}</button>`).join("");
+  $$("#acChips .hmchip").forEach(b=>b.onclick=()=>goSearch(b.textContent));
+  $("#acGo").onclick=()=>goSearch($("#acQ").value);$("#acQ").addEventListener("keydown",e=>{if(e.key==="Enter")goSearch($("#acQ").value)});
+  const Q=[];const netOf=f=>{let s=0;for(const l of L){const v=val(l,LC);if(v==null||isImp(l)||!f(l))continue;s+=sensOf(l)==="charge"?v:-v}return s};
+  const sumOf=(f,sens)=>{let s=0;for(const l of L){const v=val(l,LC);if(v==null||sensOf(l)!==sens||!f(l))continue;s+=v}return s};
+  Q.push(["Combien rapportent les impôts ?",mio(sumOf(l=>l[1].slice(0,2)==="40","revenu")),`Nature « Impôts », comptes ${yC}`,()=>goSearch("impôt")]);
+  Q.push(["Combien coûte le personnel communal ?",mio(sumOf(l=>l[1].slice(0,2)==="30","charge")),`Nature « Autorités et personnel », comptes ${yC}`,()=>goSearch("traitements")]);
+  Q.push(["Combien la commune verse-t-elle au Canton et à d'autres communes ?",mio(sumOf(l=>l[1].slice(0,2)==="35","charge")),`Participations à des collectivités publiques, comptes ${yC}`,()=>goSearch("participation")]);
+  const tp=netOf(l=>l[0].slice(0,2)==="18");if(tp)Q.push(["Combien coûtent les transports publics ?",mio(tp),`Coût net du groupe « Transports publics », comptes ${yC}`,()=>{openTab("t-ex");exPath=["1","18"];renderEx()}]);
+  const ec=netOf(l=>l[0][0]==="5");Q.push(["Combien coûte l'instruction publique ?",mio(ec),`Coût net de la direction « ${dirName("5")} » (écoles, santé scolaire, temples et cultes), comptes ${yC}`,()=>{openTab("t-ex");exPath=["5"];renderEx()}]);
+  const en=netOf(l=>l[0][0]==="7");Q.push([`Combien coûte la direction « ${dirName("7")} » ?`,mio(en),`Coût net, comptes ${yC}`,()=>{openTab("t-ex");exPath=["7"];renderEx()}]);
+  $("#acQs").innerHTML=Q.map((q,i)=>`<button class="qcard" data-i="${i}"><span class="qq">${esc(q[0])}</span><span class="qa">${q[1]}</span><span class="qs">${esc(q[2])}</span></button>`).join("");
+  $$("#acQs .qcard").forEach(b=>b.onclick=()=>Q[+b.dataset.i][3]());}
+function goSearch(q){$("#reQ").value=q;openTab("t-re");renderRe()}
+
+// ---------- EXPLORER ----------
+let exPath=[];
+function renderEx(){const sid=$("#exSer").value, sens=exSensV(), imp=$("#exImp").checked;
+  const lv=exPath.length;const filt=l=>(lv<1||l[0][0]===exPath[0])&&(lv<2||l[0].slice(0,2)===exPath[1])&&(lv<3||l[0]===exPath[2]);
+  const key=[l=>l[0][0],l=>l[0].slice(0,2),l=>l[0],l=>l[0]+"|"+l[1]][Math.min(lv,3)];
+  const m=agg(sid,key,{sens,imp,filter:filt});const items=[...m].filter(d=>d[1]>0).map(([k,v])=>({k,v}));
+  const nm=k=>[dirName,grpName,secName,k=>L[LIDX.get(k)][2]][Math.min(lv,3)](k);
+  const crumbs=[["Tout",-1],...exPath.map((p,i)=>[[dirName,grpName,secName][i](p),i])];
+  $("#exCrumbs").innerHTML=crumbs.map((c,i)=>i===crumbs.length-1?`<span class="cur">${esc(c[0])}</span>`:`<button data-i="${c[1]}">${esc(c[0])}</button><span class="sep">›</span>`).join("");
+  $$("#exCrumbs button").forEach(b=>b.onclick=()=>{exPath=exPath.slice(0,+b.dataset.i+1);renderEx()});
+  const el=$("#tm");const W=el.clientWidth,H=el.clientHeight;const total=d3.sum(items,d=>d.v);
+  const root=d3.hierarchy({children:items}).sum(d=>d.v||0).sort((a,b)=>b.value-a.value);d3.treemap().size([W,H]).paddingInner(2).round(true)(root);
+  el.innerHTML="";for(const n of root.leaves()){const d=n.data;const t=document.createElement("div");t.className="tile";
+    const dk=lv>=3?exPath[0]:(lv===0?d.k:exPath[0]);t.style.cssText=`left:${n.x0}px;top:${n.y0}px;width:${n.x1-n.x0}px;height:${n.y1-n.y0}px;background:${dirColor(dk)};${lv>0?`filter:saturate(${.55+.45*(n.value/root.leaves()[0].value)})`:""}`;
+    const big=(n.x1-n.x0)>70&&(n.y1-n.y0)>34;t.innerHTML=big?`<div class="tn">${esc(nm(d.k))}</div><div class="tv">${mio(d.v)} · ${(d.v/total*100).toLocaleString("fr-CH",{maximumFractionDigits:1})} %</div>`:"";
+    t.dataset.tip=tipRows(nm(d.k),[["Montant",chf(d.v)],["Part",(d.v/total*100).toLocaleString("fr-CH",{maximumFractionDigits:1})+" %"]])+(lv<3?'<div class="note">Cliquer pour détailler</div>':'<div class="note">Cliquer pour l\'historique</div>');
+    t.onclick=()=>{if(lv<3){exPath.push(d.k);renderEx()}else openLine(LIDX.get(d.k))};el.appendChild(t)}
+  $("#exNote").innerHTML=`Total affiché : <b>${chf(total)}</b> (${esc(SNAME(sid))}).`+(imp?"":` Les ${g("imputations")} sont exclues.`)+` Les ${g("fonds","attributions et prélèvements aux fonds")} sont inclus.`;}
+let exSensV;
+function initEx(){fillSel($("#exSer"),[...S].reverse().map(s=>[s.id,s.nom]),LC);exSensV=seg("#exSens",()=>renderEx());$("#exSer").onchange=renderEx;$("#exImp").onchange=renderEx;addEventListener("resize",()=>{if(curTab==="t-ex")renderEx()})}
+
+// ---------- RECHERCHER ----------
+const SYN={"ecole":["ecole","enseignement","scolaire","apems","asigos","classes","eleves","college"],"creche":["accueil","prescolaire","ajenol","uape","mamans d'accueil","enfance","faje"],"accueil de jour":["accueil","prescolaire","ajenol","uape","apems","mamans d'accueil","faje"],"impot":["impot"],"impots":["impot"],"dechets":["dechets","ordures","valorsa","ramassage"],"salaires":["traitements","personnel","cotisations"],"salaire":["traitements"],"transports publics":["transports publics","transports"],"bus":["transports"],"facture sociale":["facture sociale","prevoyance sociale","pereq"],"subventions":["subvention","aides"],"piscine":["piscine"],"police":["police"],"sport":["sport","piscine","malley","badminton","football","patinoire"],"culture":["culture","theatre","bibliotheque","musicale","cinefestival"],"social":["social","sociale","araspe"],"energie":["energie","electricite","chauffage","gaz"]};
+function terms(q){const n=norm(q).trim();if(!n)return[];return SYN[n]||SYN[n.replace(/s$/,"")]||[n.replace(/s$/,"")]}
+const SEARCH=L.map((l,i)=>norm(l[2]+" "+secName(l[0])+" "+grpName(l[0].slice(0,2))+" "+l[0]+" "+l[1]+" "+l[0]+"."+l[1]));
+const SEARCHC=L.map((l,i)=>norm((D.commentaires[i]||[]).map(c=>c[1]).join(" ")));
+let reLim=60,reSensV;
+function renderRe(){const q=$("#reQ").value, t=terms(q), dir=$("#reDir").value, sens=reSensV(), wc=$("#reCom").checked;
+  const cols=[LC,LB,LP].filter(Boolean);
+  let res=[];L.forEach((l,i)=>{if(dir&&l[0][0]!==dir)return;if(sens&&sensOf(l)!==sens)return;if(t.length&&!t.some(x=>SEARCH[i].includes(x)||(wc&&SEARCHC[i].includes(x))))return;res.push(i)});
+  const key=i=>Math.max(...cols.map(c=>Math.abs(val(L[i],c)||0)));res.sort((a,b)=>key(b)-key(a));
+  $("#reInfo").textContent=`${res.length} ligne${res.length>1?"s":""}`+(t.length&&t.join()!==norm(q).trim()?` (recherche élargie à : ${t.join(", ")})`:"")+".";
+  $("#reT").innerHTML=`<thead><tr><th>Ligne</th><th>Service</th>${cols.map(c=>`<th class="r">${esc(SNAME(c))}</th>`).join("")}</tr></thead><tbody>`+
+    res.slice(0,reLim).map(i=>{const l=L[i];return `<tr class="clk" data-i="${i}"><td>${esc(l[2])}${D.commentaires[i]?'<span class="chip">commenté</span>':""}<div class="code">${l[0]}.${l[1]} · ${sensOf(l)}</div></td><td>${esc(secName(l[0]))}</td>${cols.map(c=>`<td class="r">${chf(val(l,c))}</td>`).join("")}</tr>`}).join("")+"</tbody>";
+  $$("#reT tr.clk").forEach(r=>r.onclick=()=>openLine(+r.dataset.i));
+  $("#reMore").innerHTML=res.length>reLim?`<button class="btn" id="reMoreB">Afficher plus</button><span>${reLim} sur ${res.length}</span>`:"";
+  if(res.length>reLim)$("#reMoreB").onclick=()=>{reLim+=100;renderRe()};}
+function initRe(){fillSel($("#reDir"),[["","Toutes les directions"],...Object.entries(D.directions)]);reSensV=seg("#reSens",()=>{reLim=60;renderRe()});
+  let tm;$("#reQ").addEventListener("input",()=>{clearTimeout(tm);tm=setTimeout(()=>{reLim=60;renderRe()},160)});$("#reDir").onchange=renderRe;$("#reCom").onchange=renderRe}
+
+// ---------- VUE D'ENSEMBLE ----------
+let ovWhatV;
+function renderOv(){const w=ovWhatV();const f=s=>w==="res"?+RES[s].resultat:w==="charge"?+RES[s].charges:+RES[s].revenus;
+  lineChart($("#ovChart"),{C:seriesVals("C",f),B:seriesVals("B",f),P:seriesVals("P",f)});$("#ovLeg").innerHTML=legendHTML();
+  if(drawn.ov)return;drawn.ov=1;
+  const ord=[...S].sort((a,b)=>a.annee-b.annee||"CBP".indexOf(a.type)-"CBP".indexOf(b.type));
+  $("#ovRes").innerHTML=`<thead><tr><th>Série</th><th class="r">Charges</th><th class="r">Revenus</th><th class="r">Résultat</th><th>Source</th></tr></thead><tbody>`+
+    ord.map(s=>{const r=RES[s.id];return `<tr><td>${esc(s.nom)}</td><td class="r">${chf(+r.charges)}</td><td class="r">${chf(+r.revenus)}</td><td class="r">${chf(+r.resultat)}</td><td>${s.docs.map(d=>`<a href="${esc(D.documents[d].url)}" target="_blank" rel="noopener">${esc(D.documents[d].titre)}</a>`).join("<br>")}</td></tr>`}).join("")+"</tbody>";
+  const cs=ofType("C").map(s=>s.id).concat(LB?[LB]:[]);
+  const tbl=(el,keys,name,f)=>{el.innerHTML=`<thead><tr><th></th>${cs.map(c=>`<th class="r">${esc(SNAME(c))}</th>`).join("")}</tr></thead><tbody>`+keys.map(k=>`<tr><td>${esc(name(k))}</td>${cs.map(c=>`<td class="r">${chf(f(c).get(k))}</td>`).join("")}</tr>`).join("")+"</tbody>"};
+  const dm={};cs.forEach(c=>dm[c]=agg(c,l=>l[0][0]));tbl($("#ovDir"),Object.keys(D.directions),dirName,c=>dm[c]);
+  const nm={};cs.forEach(c=>nm[c]=agg(c,l=>l[1].slice(0,2),{sens:"charge"}));const nk=[...new Set(cs.flatMap(c=>[...nm[c].keys()]))].sort();
+  tbl($("#ovNat"),nk,k=>D.natures[k]||k,c=>nm[c]);}
+
+// ---------- ÉVOLUTIONS ----------
+let evSensV;
+function cmpKind(a,b){const A=S[SI[a]],B=S[SI[b]];if(A.type===B.type&&A.type==="C")return["ok","Comptes et comptes","Deux années réalisées : comparaison directe."];
+  if(A.type===B.type)return["ok","Budget et budget","Deux prévisions : comparaison directe des intentions."];
+  if(A.annee===B.annee)return["info","Même année, prévu et réalisé","Écart entre prévision et réalisation de la même année (voir aussi « Budget et comptes »)."];
+  return["warn","À interpréter avec prudence","Une prévision est comparée à une réalisation d'une autre année : l'écart mélange évolution et précision des prévisions."]}
+function renderEv(){const a=$("#evA").value,b=$("#evB").value,lv=$("#evLvl").value,sens=evSensV();
+  const o=sens==="net"?{}:{sens};const A=agg(a,keyOf[lv],o),B=agg(b,keyOf[lv],o);
+  const ks=new Set([...A.keys(),...B.keys()]);const it=[...ks].map(k=>({k,n:nameOf[lv](k),sub:subOf[lv](k),a:A.get(k)||0,b:B.get(k)||0})).map(d=>({...d,d:d.b-d.a})).filter(d=>Math.abs(d.d)>=1);
+  const k=cmpKind(a,b);$("#evBadge").innerHTML=`<span class="badge ${k[0]}">${k[1]}</span> <span class="note">${esc(k[2])} Hors imputations internes.</span>`;
+  const click=d=>{if(lv==="lig")openLine(LIDX.get(d.k));else if(lv==="sec"){$("#fsS").value=d.k;openTab("t-fs")}};
+  divbars($("#evUp"),it.filter(d=>d.d>0).sort((x,y)=>y.d-x.d).slice(0,15),click);divbars($("#evDn"),it.filter(d=>d.d<0).sort((x,y)=>x.d-y.d).slice(0,15),click)}
+function initEv(){const opts=[...S].reverse().map(s=>[s.id,s.nom]);const cs=ofType("C");fillSel($("#evA"),opts,cs.length>1?cs[cs.length-2].id:S[0].id);fillSel($("#evB"),opts,LC);
+  evSensV=seg("#evSens",renderEv);["#evA","#evB","#evLvl"].forEach(s=>$(s).onchange=renderEv)}
+
+// ---------- BUDGET ET COMPTES ----------
+let bcSensV,bcLim=40;
+function renderBc(){const y=$("#bcY").value,lv=$("#bcLvl").value,sens=bcSensV();const b="B"+y,c="C"+y;
+  const B=agg(b,keyOf[lv],{sens,imp:true}),C=agg(c,keyOf[lv],{sens,imp:true});const ks=new Set([...B.keys(),...C.keys()]);
+  const it=[...ks].map(k=>({k,n:nameOf[lv](k),sub:subOf[lv](k),b:B.get(k)||0,c:C.get(k)||0})).map(d=>({...d,d:d.c-d.b})).filter(d=>Math.abs(d.d)>=1).sort((x,y)=>Math.abs(y.d)-Math.abs(x.d));
+  const tb=tot(b,sens),tc=tot(c,sens);
+  $("#bcKpis").innerHTML=[[`${sens==="charge"?"Charges":"Revenus"} budgétées`,mio(tb),SNAME(b)],[`${sens==="charge"?"Charges":"Revenus"} réalisées`,mio(tc),SNAME(c)],["Écart",sgn(tc-tb),fpct(pct(tc,tb))],["Résultat",sgn(+RES[c].resultat),"prévu : "+sgn(+RES[b].resultat)]].map(k=>`<div class="kpi"><div class="k">${k[0]}</div><div class="v num">${k[1]}</div><div class="s">${esc(k[2])}</div></div>`).join("");
+  $("#bcT").innerHTML=`<thead><tr><th>${lv==="lig"?"Ligne":lv==="sec"?"Service":"Direction"}</th><th class="r">Budget</th><th class="r">Comptes</th><th class="r">Écart</th><th class="r">%</th>${lv==="lig"?"<th>Commentaire de la commune</th>":""}</tr></thead><tbody>`+
+    it.slice(0,bcLim).map((d,i)=>{const li=lv==="lig"?LIDX.get(d.k):null;const cm=li!=null?(D.commentaires[li]||[]).filter(x=>D.documents[x[0]]?.type==="comptes"&&D.documents[x[0]].annee==y).map(x=>x[1]).join(" "):"";
+      return `<tr class="clk" data-i="${i}"><td>${esc(d.n)}<div class="code">${esc(d.sub)}</div></td><td class="r">${chf(d.b)}</td><td class="r">${chf(d.c)}</td><td class="r">${sgn(d.d)}</td><td class="r">${fpct(pct(d.c,d.b))}</td>${lv==="lig"?`<td style="min-width:260px;font-size:12.5px;color:var(--fg-2)">${esc(cm)}</td>`:""}</tr>`}).join("")+"</tbody>";
+  $$("#bcT tr.clk").forEach(r=>r.onclick=()=>{const d=it[+r.dataset.i];if(lv==="lig")openLine(LIDX.get(d.k));else if(lv==="sec"){$("#fsS").value=d.k;openTab("t-fs")}});
+  $("#bcMore").innerHTML=it.length>bcLim?`<button class="btn" id="bcMoreB">Afficher plus</button><span>${bcLim} sur ${it.length}</span>`:"";if(it.length>bcLim)$("#bcMoreB").onclick=()=>{bcLim+=60;renderBc()}}
+function initBc(){const ys=ofType("C").map(s=>s.annee).filter(y=>SI["B"+y]!=null).reverse();fillSel($("#bcY"),ys.map(y=>[y,String(y)]),ys[0]);
+  bcSensV=seg("#bcSens",()=>{bcLim=40;renderBc()});["#bcY","#bcLvl"].forEach(s=>$(s).onchange=()=>{bcLim=40;renderBc()})}
+
+// ---------- AMENDEMENTS ----------
+function renderAm(){const y=$("#amY").value;const A=D.amendements.filter(a=>a.annee===y);const p="P"+y,b="B"+y;
+  const ch=d3.sum(A.filter(a=>a.sens==="charge"),a=>+a.difference),rv=d3.sum(A.filter(a=>a.sens==="revenu"),a=>+a.difference);
+  $("#amKpis").innerHTML=[["Lignes modifiées",String(A.length),""],["Effet sur les charges",sgn(ch),""],["Effet sur les revenus",sgn(rv),""],["Résultat",`${sgn(+RES[p].resultat)} → ${sgn(+RES[b].resultat)}`,"projet → voté"]].map(k=>`<div class="kpi"><div class="k">${k[0]}</div><div class="v num">${k[1]}</div><div class="s">${k[2]}</div></div>`).join("");
+  const dp=S[SI[p]].docs.map(d=>D.documents[d]);const db=S[SI[b]].docs.map(d=>D.documents[d]);
+  $("#amNote").innerHTML=`Projet : ${dp.map(d=>esc(d.titre)).join(", ")}. Budget voté : colonne « Budget ${y} » de ${db.map(d=>esc(d.titre)).join(", ")}.`+(dp.some(d=>d.note)?" "+dp.map(d=>esc(d.note)).join(" "):"");
+  $("#amT").innerHTML=`<thead><tr><th>Ligne</th><th>Service</th><th class="r">Projet</th><th class="r">Voté</th><th class="r">Différence</th></tr></thead><tbody>`+
+    A.sort((x,z)=>Math.abs(z.difference)-Math.abs(x.difference)).map(a=>{const i=LIDX.get(a.section+"|"+a.compte);return `<tr class="clk" data-i="${i}"><td>${esc(L[i][2])}<div class="code">${a.section}.${a.compte} · ${a.sens}</div></td><td>${esc(secName(a.section))}</td><td class="r">${chf(+a.projet)}</td><td class="r">${chf(+a.vote)}</td><td class="r">${sgn(+a.difference)}</td></tr>`}).join("")+"</tbody>";
+  $$("#amT tr.clk").forEach(r=>r.onclick=()=>openLine(+r.dataset.i))}
+function initAm(){const ys=[...new Set(D.amendements.map(a=>a.annee))].sort().reverse();fillSel($("#amY"),ys.map(y=>[y,y]),ys[0]);$("#amY").onchange=renderAm}
+
+// ---------- FICHE SERVICE ----------
+function renderFs(){const s=$("#fsS").value;const idx=L.map((l,i)=>i).filter(i=>L[i][0]===s);
+  const net=sid=>{let t=0,n=0;for(const i of idx){const v=val(L[i],sid);if(v==null||isImp(L[i]))continue;n++;t+=sensOf(L[i])==="charge"?v:-v}return n?t:null};
+  const cs=(sid,sens)=>{let t=0;for(const i of idx){const v=val(L[i],sid);if(v!=null&&sensOf(L[i])===sens&&!isImp(L[i]))t+=v}return t};
+  $("#fsKpis").innerHTML=[["Direction",dirName(s[0]),grpName(s.slice(0,2))],["Coût net "+S[SI[LC]].annee,mio(net(LC)),"charges moins revenus, comptes"],["Charges "+S[SI[LC]].annee,mio(cs(LC,"charge")),"comptes"],["Coût net prévu "+S[SI[LB]].annee,mio(net(LB)),"budget voté"]].map(k=>`<div class="kpi"><div class="k">${k[0]}</div><div class="v num" style="${k[0]==="Direction"?"font-size:19px":""}">${esc(k[1])}</div><div class="s">${esc(k[2])}</div></div>`).join("");
+  lineChart($("#fsChart"),{C:seriesVals("C",net),B:seriesVals("B",net),P:seriesVals("P",net)});$("#fsLeg").innerHTML=legendHTML()+'<span>Coût net hors imputations internes</span>';
+  const cols=[...S].sort((a,b)=>b.annee-a.annee||"CBP".indexOf(a.type)-"CBP".indexOf(b.type)).filter(x=>x.type!=="P"||x.id===LP).slice(0,7);
+  $("#fsT").innerHTML=`<thead><tr><th>Ligne</th>${cols.map(c=>`<th class="r">${esc(c.nom)}</th>`).join("")}</tr></thead><tbody>`+idx.map(i=>{const l=L[i];return `<tr class="clk" data-i="${i}"><td>${esc(l[2])}${D.commentaires[i]?'<span class="chip">commenté</span>':""}<div class="code">${l[1]} · ${sensOf(l)}</div></td>${cols.map(c=>`<td class="r">${chf(val(l,c.id))}</td>`).join("")}</tr>`}).join("")+"</tbody>";
+  $$("#fsT tr.clk").forEach(r=>r.onclick=()=>openLine(+r.dataset.i));store("bp-fs",s)}
+function initFs(){const ks=Object.keys(D.sections).filter(k=>L.some(l=>l[0]===k)).sort();fillSel($("#fsS"),ks.map(k=>[k,`${k} · ${secName(k)}`]),load("bp-fs")||ks[0]);if(!$("#fsS").value)$("#fsS").value=ks[0];$("#fsS").onchange=renderFs}
+
+// ---------- COMMENT LIRE ----------
+function renderGu(){if(drawn.gu)return;drawn.gu=1;const docs=Object.entries(D.documents).sort((a,b)=>a[1].annee-b[1].annee);
+  $("#p-gu").innerHTML=`<h2>Comment lire ces chiffres</h2>
+  <p>Ce site reprend les tableaux publiés par la Ville de Prilly : chaque ligne du budget de fonctionnement, avec ses montants pour chaque année disponible. Il ne contient aucune estimation : seulement les chiffres des documents officiels, remis en forme.</p>
+  <h3>Projet, budget voté et comptes</h3>
+  <p>Chaque automne, la Municipalité présente un ${g("projet","projet de budget")}. Le Conseil communal peut l'${g("amendement","amender")} puis le vote : c'est le ${g("budget","budget voté")}. Après la fin de l'année, les ${g("comptes")} indiquent ce qui a réellement été dépensé et encaissé. Le budget est une prévision et une autorisation de dépenser ; les comptes sont la réalité. Comparer les deux montre la précision des prévisions, pas forcément une bonne ou une mauvaise gestion : une économie peut venir d'un poste resté vacant comme d'un projet reporté.</p>
+  <h3>D'où viennent les chiffres</h3>
+  <p>Chaque document contient trois colonnes : l'année présentée, l'année précédente et des comptes plus anciens. Le budget voté d'une année se lit dans le document suivant, où il figure tel qu'adopté par le Conseil. Les comptes d'une année se lisent dans les états financiers de cette année ou, à défaut, dans le budget publié deux ans plus tard.</p>
+  <ul>${docs.map(([k,d])=>`<li><a href="${esc(d.url)}" target="_blank" rel="noopener">${esc(d.titre)}</a> : ${d.colonnes.map(c=>{const[t,y]=c.split(":");return(t==="projet"?"projet ":t==="budget"?"budget voté ":"comptes ")+y}).join(", ")}${d.note?" — "+esc(d.note):""}</li>`).join("")}</ul>
+  <p>Deux documents scannés, les budgets 2024 et 2025 amendés par le Conseil communal, servent de contrôle : leurs totaux correspondent exactement aux budgets votés repris ici.</p>
+  <h3>Fiabilité</h3>
+  <p>Chaque document est contrôlé contre ses propres totaux : total des charges et des revenus, sous-totaux de chaque service, groupe et direction, et totaux par nature. ${D.controles.ok} contrôles sur ${D.controles.total} sont exacts au centime${D.controles.total-D.controles.ok?` ; les ${D.controles.total-D.controles.ok} autres sont de petites différences de classement par nature dans les documents eux-mêmes, sans effet sur les totaux`:""}. Une page des états financiers 2025 (la page 36) a été publiée sans texte ; elle a été lue par reconnaissance de caractères, et ses montants ferment exactement les totaux officiels.</p>
+  <h3>Ce que les chiffres ne disent pas</h3>
+  <p>Ce site couvre le <b>budget de fonctionnement</b> : les dépenses et recettes courantes. Les investissements (constructions, grands travaux) et la dette figurent dans d'autres parties des documents et ne sont pas encore repris.</p>
+  <p>Certaines écritures ne sont pas des dépenses auprès de tiers : les ${g("imputations")}, les ${g("fonds","attributions et prélèvements aux fonds de réserve")} et les ${g("amortissements")}. Les totaux officiels les incluent ; plusieurs graphiques excluent les imputations internes pour éviter les doubles comptes, et l'indiquent.</p>
+  <p>Les services sont parfois réorganisés : un compte peut changer de numéro ou passer d'un service à l'autre. Une ligne qui apparaît ou disparaît n'est donc pas forcément une nouvelle dépense ou une dépense supprimée.</p>
+  <p>Les libellés sont écrits en majuscules sans accents dans les documents ; ils sont affichés ici en minuscules avec les accents rétablis. Les initiales des élu·e·s responsables, qui figurent à côté du nom de chaque service, ne sont pas reprises.</p>
+  <h3>Glossaire</h3><dl class="glossary">${Object.values(GLOSS).map(x=>`<dt>${esc(x[0])}</dt><dd>${esc(x[1])}</dd>`).join("")}</dl>
+  <h3>Mesure d'audience</h3><p>La version publique du site peut compter les visites avec un outil sans cookies qui ne collecte aucune donnée personnelle ; il sert uniquement à savoir combien de personnes consultent le site et quels onglets sont utilisés.</p>
+  <h3>Neutralité</h3>
+  <p>Ce site décrit les chiffres ; il ne dit pas ce qu'il faudrait en conclure, ce qui relève d'un choix politique. Les couleurs signalent un sens (hausse, baisse), pas un jugement. Les données complètes, la méthode et le code sont publics : chacun peut vérifier, réutiliser ou signaler une erreur. En cas de doute, le document officiel fait foi.</p>
+  <p>Page des documents officiels : <a href="${esc(D.page_source)}" target="_blank" rel="noopener">prilly.ch, budgets et comptes</a>.</p>`;}
+
+const RENDER={"t-ac":renderAccueil,"t-ex":()=>renderEx(),"t-re":()=>renderRe(),"t-gu":renderGu,"t-ov":renderOv,"t-ev":renderEv,"t-bc":renderBc,"t-am":renderAm,"t-fs":renderFs};
+initEx();initRe();initEv();initBc();initAm();initFs();ovWhatV=seg("#ovWhat",renderOv);
+$("#foot").innerHTML=`Source : Ville de Prilly, budgets et états financiers (<a href="${esc(D.page_source)}" target="_blank" rel="noopener">prilly.ch</a>). Mise en forme : projet indépendant « Budget de Prilly en données ouvertes ». Données et code : licence ouverte. En cas de doute, le document officiel fait foi.`;
+openTab(load("bp-tab")&&$("#"+load("bp-tab"))?load("bp-tab"):"t-ac");
+</script>

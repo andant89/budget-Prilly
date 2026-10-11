@@ -1,0 +1,87 @@
+section,nom,groupe,groupe_nom,direction,direction_nom
+1000,Conseil communal,10,Autorités,1,Administration générale
+1010,Municipalité,10,Autorités,1,Administration générale
+1100,Administration générale,11,Administration,1,Administration générale
+1110,État civil,11,Administration,1,Administration générale
+1120,Énergie et environnement,11,Administration,1,Administration générale
+1300,Service des ressources humaines,13,Ressources humaines,1,Administration générale
+1500,Sociétés récréatives,15,Affaires culturelles et de loisirs,1,Administration générale
+1510,Culture et intégration,15,Affaires culturelles et de loisirs,1,Administration générale
+1520,Théâtres,15,Affaires culturelles et de loisirs,1,Administration générale
+1530,Bibliothèque,15,Affaires culturelles et de loisirs,1,Administration générale
+1540,Marché - four à pain,15,Affaires culturelles et de loisirs,1,Administration générale
+1550,Ludothèque,15,Affaires culturelles et de loisirs,1,Administration générale
+1700,Sports,17,Sports,1,Administration générale
+1710,Piscine de la Fleur-de-Lys,17,Sports,1,Administration générale
+1720,Piscine de Fontadel,17,Sports,1,Administration générale
+1730,Centre sportif de Malley,17,Sports,1,Administration générale
+1740,Restaurant de la piscine de la Fleur-de-Lys,17,Sports,1,Administration générale
+1800,Transports régionaux,18,Transports publics,1,Administration générale
+1900,Informatique,19,Informatique,1,Administration générale
+2000,Comptabilité générale,20,Compt. générale - caisse - contentieux,2,Finances
+2100,Impôts,21,Impôts,2,Finances
+2200,Service de la dette,22,Service financier,2,Finances
+2210,Rendement des titres et créances,22,Service financier,2,Finances
+2300,Postes non ventilés,23,Amortissements et réserves non ventilés,2,Finances
+3000,Domaines et bâtiments,30,Service administratif et technique,3,Domaines
+3100,Terrains et biens communaux,31,Terrains et biens communaux,3,Domaines
+3200,Forêt,32,Forêt,3,Domaines
+3300,Vigne,33,Vigne,3,Domaines
+3500,Bâtiments locatifs,35,Bâtiments,3,Domaines
+3510,Bâtiments administratifs,35,Bâtiments,3,Domaines
+3520,Édicules publics,35,Bâtiments,3,Domaines
+3530,Propriété de Plan-Sepey,35,Bâtiments,3,Domaines
+4100,Infrastructure et espace public,41,Service des travaux,4,Travaux
+4200,Urbanisme et constructions,42,Urbanisme et constructions,4,Travaux
+4290,La fabrique de Malley,42,Urbanisme et constructions,4,Travaux
+4300,"Routes, exploitation et gérance",43,Routes,4,Travaux
+4305,Quartier de Malley,43,Routes,4,Travaux
+4310,Éclairage public,43,Routes,4,Travaux
+4320,Décorations de Noël,43,Routes,4,Travaux
+4400,"Parcs, promenades, cimetières",44,"Parcs, promenades, cimetières",4,Travaux
+4410,Entretien tombes,44,"Parcs, promenades, cimetières",4,Travaux
+4500,Ordures ménagères et déchets,45,Ordures ménagères et déchets,4,Travaux
+4600,"PGEE (réseaux), épuration",46,"Réseau d'égouts, épuration",4,Travaux
+5000,Administration écoles primaires,50,Administration des écoles,5,Instruction publique
+5010,Administration écoles secondaires,50,Administration des écoles,5,Instruction publique
+5020,"Écoles primaires, secondaires et assimilés",50,Administration des écoles,5,Instruction publique
+5100,Classes primaires (1 à 6p),51,Enseignement primaire,5,Instruction publique
+5120,Bâtiments primaires (1 à 6p),51,Enseignement primaire,5,Instruction publique
+5200,Classes secondaires (7-8; 9-11P),52,Enseignement secondaire,5,Instruction publique
+5210,Bâtiments secondaires,52,Enseignement secondaire,5,Instruction publique
+5310,Classe de langage,53,Enseignement spécialisé,5,Instruction publique
+5330,Classes d'intégration,53,Enseignement spécialisé,5,Instruction publique
+5340,CRENOL,53,Enseignement spécialisé,5,Instruction publique
+5400,Office régional d'orientation prof.,54,Office d'orientation scolaire et professionnelle,5,Instruction publique
+5600,Service médical et dentaire,56,Service médical et dentaire,5,Instruction publique
+5710,Colonie de vacances,57,"Camps scolaires, colonies",5,Instruction publique
+5720,Camps - école à la montagne - primaire,57,"Camps scolaires, colonies",5,Instruction publique
+5800,Temples et cultes,58,Temples et cultes,5,Instruction publique
+6100,Corps de police,61,Corps de police - signalisation,6,Police
+6110,Signalisation routière,61,Corps de police - signalisation,6,Police
+6200,Contrôle des habitants,62,Contrôle des habitants,6,Police
+6400,Service des inhumations,64,Service des inhumations,6,Police
+6500,Défense contre l'incendie,65,Service de défense incendie,6,Police
+6600,Protection civile,66,Protection civile,6,Police
+6800,Affaires militaires,68,Affaires militaires,6,Police
+7100,ARASPE,71,Service social,7,Cohésion sociale - enfance - jeunesse
+7110,Centre de loisirs,71,Service social,7,Cohésion sociale - enfance - jeunesse
+7130,Accueil préscolaire,71,Service social,7,Cohésion sociale - enfance - jeunesse
+7132,CVE les Acacias,71,Service social,7,Cohésion sociale - enfance - jeunesse
+7137,CVE les Sorbiers,71,Service social,7,Cohésion sociale - enfance - jeunesse
+7138,CVE le Tilleul,71,Service social,7,Cohésion sociale - enfance - jeunesse
+7140,Service de l'enfance,71,Service social,7,Cohésion sociale - enfance - jeunesse
+7141,Accueil familial de jour,71,Service social,7,Cohésion sociale - enfance - jeunesse
+7151,APEMS confrérie,71,Service social,7,Cohésion sociale - enfance - jeunesse
+7152,APEMS Corminjoz,71,Service social,7,Cohésion sociale - enfance - jeunesse
+7153,APEMS Jolimont,71,Service social,7,Cohésion sociale - enfance - jeunesse
+7154,APEMS Mont-Goulin,71,Service social,7,Cohésion sociale - enfance - jeunesse
+7155,UAPE le Tilleul,71,Service social,7,Cohésion sociale - enfance - jeunesse
+7156,APEMS vieux-collège,71,Service social,7,Cohésion sociale - enfance - jeunesse
+7160,Services sociaux communaux,71,Service social,7,Cohésion sociale - enfance - jeunesse
+7170,Réseau AJENOL,71,Service social,7,Cohésion sociale - enfance - jeunesse
+7180,Activités parascolaires 1P-6P,71,Service social,7,Cohésion sociale - enfance - jeunesse
+7184,Activités parascolaires 7P-11P,71,Service social,7,Cohésion sociale - enfance - jeunesse
+7186,Activités à Plan-Sepey,71,Service social,7,Cohésion sociale - enfance - jeunesse
+7190,"Service jeunesse, sport et cohésion sociale",71,Service social,7,Cohésion sociale - enfance - jeunesse
+7200,Prévoyance sociale,72,Prévoyance sociale,7,Cohésion sociale - enfance - jeunesse

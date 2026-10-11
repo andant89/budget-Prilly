@@ -1,0 +1,4 @@
+sources/pdf/*.pdf
+__pycache__/
+*.pyc
+build/
