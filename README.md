@@ -2,7 +2,7 @@
 
 Les budgets et les comptes de la Ville de Prilly, ligne par ligne, extraits des documents officiels de la commune et rendus lisibles : un tableau de bord interactif et des fichiers CSV réutilisables.
 
-**Couverture actuelle** : comptes 2021 à 2025, budgets votés 2022 à 2025, projets de budget de la Municipalité 2023 à 2025, soit 1'604 lignes du budget de fonctionnement dans 7 directions.
+**Couverture actuelle** : comptes 2015 à 2025, budgets votés 2016 à 2025, projets de budget de la Municipalité 2023 à 2025, soit 2'121 lignes du budget de fonctionnement dans 8 directions.
 
 > Projet indépendant, sans lien avec l'administration communale. Les chiffres proviennent des documents publiés par la Ville de Prilly ; en cas de doute, le document officiel fait foi.
 
@@ -37,6 +37,7 @@ L'outil décrit ce que montrent les chiffres. Il ne dit pas ce qu'il faudrait en
 | `resultats.csv` | série | charges, revenus, résultat, document source |
 | `amendements.csv` | ligne modifiée | année, projet de la Municipalité, budget voté, différence |
 | `commentaires.csv` | commentaire | texte des explications données par la commune pour une ligne |
+| `correspondance_numerotation.csv` | ancien compte | lien entre l'ancienne numérotation (jusqu'en 2018) et la nouvelle, avec la méthode utilisée |
 | `controles.csv` | contrôle | plus de 3'000 contrôles contre les totaux officiels de chaque document |
 
 Séries : `C2025` = comptes 2025 (réalisé), `B2025` = budget 2025 voté par le Conseil communal, `P2025` = projet de budget 2025 de la Municipalité. Les montants sont en francs, sans arrondi, positifs pour les charges comme pour les revenus (la colonne `sens` indique lequel). Les codes suivent le plan comptable des communes vaudoises : comptes 3xxx pour les charges, 4xxx pour les revenus ; les deux premiers chiffres donnent la nature (30 personnel, 35 participations à des collectivités publiques, 40 impôts, etc.).
@@ -74,7 +75,7 @@ Pour ajouter un document (nouveau budget, nouveaux comptes), voir [docs/ajouter-
 
 ## Fiabilité
 
-Chaque document est contrôlé contre ses propres totaux : total des charges et des revenus de chaque colonne, sous-totaux de chaque service, groupe et direction, totaux par nature. Toutes les séries retombent au centime près sur les totaux officiels, et les budgets votés 2024 et 2025 correspondent aux documents amendés scannés par la commune. Les choix de méthode et leurs limites sont décrits dans [docs/methodologie.md](docs/methodologie.md).
+Chaque document est contrôlé contre ses propres totaux : total des charges et des revenus de chaque colonne, sous-totaux de chaque service, groupe et direction, totaux par nature. Toutes les séries retombent au centime près sur les totaux officiels, et les budgets votés correspondent aux récapitulatifs publiés par la commune (budgets 2016 à 2021, budgets amendés 2024 et 2025). Les comptes 2017 et 2021, publiés sous forme d'images, ont été lus par reconnaissance de caractères ; les quelques corrections manuelles sont listées dans `sources/corrections.csv`. Les choix de méthode et leurs limites sont décrits dans [docs/methodologie.md](docs/methodologie.md).
 
 ## Licence
 

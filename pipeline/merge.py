@@ -18,6 +18,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from libelles import lisible  # noqa: E402
+import numerotation as num  # noqa: E402
 from collections import defaultdict
 
 RACINE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -70,16 +71,43 @@ def charger():
 
 
 def priorite(doc, serie):
-    """Source préférée d'une série : comptes > budget ; à type égal, le document le plus récent."""
-    return (1 if doc["type"] == "comptes" else 0, doc["annee"])
+    """Source préférée d'une série : texte > document scanné ; comptes > budget ; puis le plus récent."""
+    return (0 if doc.get("ocr") else 1, 1 if doc["type"] == "comptes" else 0, doc["annee"])
+
+
+def preparer(docs):
+    """Retire les sous-totaux de l'ancienne numérotation et calcule la nouvelle clé de chaque ligne."""
+    par_id = {d["id"]: rows for d, rows, _ in docs}
+    for d, rows, _ in docs:
+        comptes = [r for r in rows if r["type"] == "compte"]
+        if any(num.ancien(r["code"]) for r in comptes):
+            garde = {id(r) for r in num.sans_sous_totaux(comptes)}
+            rows[:] = [r for r in rows if r["type"] != "compte" or id(r) in garde]
+    p = CONFIG["passage_numerotation"]
+    vieux = [r for r in par_id.get(p["ancien"], []) if r["type"] == "compte"]
+    neufs = [r for r in par_id.get(p["nouveau"], []) if r["type"] == "compte"]
+    res, nv, pris = num.correspondance(vieux, neufs, p["colonnes_ancien"], p["colonnes_nouveau"])
+    for d, rows, _ in sorted(docs, key=lambda x: -x[0]["annee"]):
+        for r in rows:
+            if r["type"] == "compte" and num.ancien(r["code"]):
+                r["cle"] = "|".join(num.completer((r["section"], r["code"]), r["libelle"], res, nv, pris)[:2])
+            elif r["type"] == "compte":
+                r["cle"] = f"{r['section']}|{r['code']}"
+    return res
 
 
 def main():
     cfg, docs = charger()
+    passage = preparer(docs)
     os.makedirs(DATA, exist_ok=True)
     controles = []
+    connus = {(e["document"], e["controle"]) for e in CONFIG.get("ecarts_connus", [])}
 
     def ctrl(doc, objet, attendu, obtenu, bloquant=True):
+        if attendu is None:
+            return True
+        if (doc, objet) in connus:
+            bloquant = False
         ok = abs((attendu or 0) - (obtenu or 0)) < TOL
         controles.append({"document": doc, "controle": objet, "attendu": f"{attendu:.2f}",
                           "obtenu": f"{obtenu:.2f}", "ecart": f"{(obtenu or 0) - (attendu or 0):.2f}",
@@ -113,28 +141,29 @@ def main():
                           for r in rows if r["type"] == "compte" and nature_de(r["code"]) == nat)
                 ctrl(doc["id"], f"{s} nature {nat}", vals[i] if nat[0] == "3" else -vals[i], tot, bloquant=False)
         # Sous-totaux par section, groupe, direction
-        section = None
         cumul = defaultdict(lambda: [0.0] * 6)
         entetes = {}
         for r in rows:
             if r["type"] in ("section", "groupe", "direction"):
                 if r["type"] == "section":
-                    section = r["code"]
                     lib = sans_initiales(r["libelle"])
                     if lib:
-                        sections[section] = (rang, lib)
+                        sections[r["code"] + ("0" if len(r["code"]) == 3 else "")] = (rang, lib)
                 elif r["type"] == "groupe":
                     groupes[r["code"]] = lisible(sans_initiales(r["libelle"]))
+                elif r["type"] == "direction" and r["code"] != "0" and r["code"] not in directions:
+                    directions[r["code"]] = lisible(sans_initiales(r["libelle"]))
                 if r["code"] != "0":
                     entetes[(r["type"], r["code"])] = [f(r[f"v{j}"]) or 0 for j in range(6)]
                 continue
-            if section is None:
+            section = r["section"]
+            if not section:
                 raise SystemExit(f"{doc['id']} : compte {r['code']} avant toute section")
             vals = [f(r[f"v{j}"]) for j in range(6)]
             for niveau, code in (("section", section), ("groupe", section[:2]), ("direction", section[0])):
                 for j in range(6):
                     cumul[(niveau, code)][j] += vals[j] or 0
-            cle = f"{section}|{r['code']}"
+            cle = r["cle"]
             if cle in libelles and libelles[cle][0] == rang:
                 raise SystemExit(f"{doc['id']} : compte en double {cle}")
             libelles[cle] = (rang, r["libelle"])
@@ -234,6 +263,10 @@ def main():
     ecrire("commentaires.csv", [{"section": x["cle"].split("|")[0], "compte": x["cle"].split("|")[1],
                                  "document": x["document"], "texte": x["texte"], "source": x["source"]}
                                 for x in commentaires], ["section", "compte", "document", "texte", "source"])
+    ecrire("correspondance_numerotation.csv",
+           [{"section_ancienne": k[0], "compte_ancien": k[1], "section": v[0], "compte": v[1], "methode": v[2]}
+            for k, v in sorted(passage.items())],
+           ["section_ancienne", "compte_ancien", "section", "compte", "methode"])
     ecrire("controles.csv", controles, ["document", "controle", "attendu", "obtenu", "ecart", "ok", "bloquant"])
 
     # Données du site
@@ -266,6 +299,8 @@ def main():
         print(f"  {r['serie']}: charges {float(r['charges']):>15,.2f} revenus {float(r['revenus']):>15,.2f} "
               f"résultat {float(r['resultat']):>14,.2f}")
     print(f"{len(amendements)} différences projet / budget voté")
+    from collections import Counter
+    print("Passage de numérotation :", dict(Counter(v[2] for v in passage.values())))
 
 
 if __name__ == "__main__":

@@ -25,18 +25,20 @@ from collections import Counter, defaultdict
 
 RACINE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(RACINE, "sources")
-NUM = re.compile(r"^-?\d{1,3}(?:['’]\d{3})*[.,]\d\d$")
-CODE = re.compile(r"^\d{4}\.?\d{3}$")
+NUM = re.compile(r"^\(?-?(?:\d{1,3}(?:['’]\d{3})+|\d{1,7})(?:[.,]\d\d)?\)?$")
+CODE = re.compile(r"^(?:\d{4}\.?\d{3}|\d{3}\.\d{4}(?:\.\d{1,3})?)$")  # 2019+ : 1100 / 3011.000 ; avant : 110.3011(.01)
 PIED = re.compile(r"^(?:\d{1,3}|(?:\d+ )?Page \d+(?: \d+)?|\d{2}\.\d{2}\.\d{4}(?: \d+)?|\d+ P e\d+|P e\d+)$")
 WORD = re.compile(r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">(.*?)</word>')
 PAGE = re.compile(r'<page width="([\d.]+)" height="([\d.]+)">(.*?)</page>', re.S)
 
 
 def montant(t):
-    return round(float(t.replace("'", "").replace("’", "").replace(",", ".")), 2)
+    neg = t.startswith("(") and t.endswith(")")
+    v = round(float(t.strip("()").replace("'", "").replace("’", "").replace(",", ".")), 2)
+    return -v if neg else v
 
 
-def mots_pdf(chemin):
+def mots_pdf(chemin, planches=False):
     """Liste des pages ; chaque page = (largeur, hauteur, [mots]) avec mot = dict x0,top,x1,bottom,text."""
     out = subprocess.run(["pdftotext", "-bbox", chemin, "-"], capture_output=True, text=True, check=True).stdout
     pages = []
@@ -44,7 +46,8 @@ def mots_pdf(chemin):
         w, h = float(w), float(h)
         mots = [{"x0": float(a), "top": float(b), "x1": float(c), "bottom": float(d), "text": html.unescape(t)}
                 for a, b, c, d, t in WORD.findall(corps)]
-        mots = [m for m in mots if m["x0"] >= 0 and m["x1"] <= w + 1]  # ignore le contenu hors page (planches InDesign)
+        if planches:  # planches InDesign : ignore le contenu de la page voisine, hors de la page
+            mots = [m for m in mots if m["x0"] >= 0 and m["x1"] <= w + 1]
         pages.append((w, h, mots))
     return pages
 
@@ -63,16 +66,57 @@ def mots_ocr(chemin_pdf, doc_id, no_page, largeur):
             with open(os.path.join(tmp, "o.tsv"), encoding="utf-8") as f, open(cache, "w", encoding="utf-8") as g:
                 g.write(f.read())
     echelle = 72 / 300
-    mots = []
+    bruts = []
     with open(cache, encoding="utf-8") as f:
         for r in csv.DictReader(f, delimiter="\t", quoting=csv.QUOTE_NONE):
             t = (r.get("text") or "").strip()
             if not t or r["conf"] in ("-1",):
                 continue
-            x0, y0 = int(r["left"]) * echelle, int(r["top"]) * echelle
-            mots.append({"x0": x0, "top": y0, "x1": x0 + int(r["width"]) * echelle,
-                         "bottom": y0 + int(r["height"]) * echelle, "text": t})
-    return mots
+            bruts.append([(r["block_num"], r["par_num"], r["line_num"]), int(r["left"]), int(r["top"]),
+                          int(r["width"]), int(r["height"]), corrige_ocr(t)])
+    # recolle les montants coupés en deux (« 606'7 » + « 13.55 »)
+    fus = []
+    for b in bruts:
+        if fus and fus[-1][0] == b[0] and 0 <= b[1] - (fus[-1][1] + fus[-1][3]) < 25 \
+                and re.fullmatch(r"\d{1,3}(?:'\d{3})*'\d{0,2}", fus[-1][5]) and re.fullmatch(r"\d{1,3}[.,]\d\d", b[5]) \
+                and NUM.match(fus[-1][5] + b[5]) and "'" in fus[-1][5]:
+            a = fus[-1]
+            fus[-1] = [a[0], a[1], a[2], b[1] + b[3] - a[1], a[4], a[5] + b[5]]
+        else:
+            fus.append(b)
+    return [{"x0": l * echelle, "top": t * echelle, "x1": (l + w) * echelle, "bottom": (t + h) * echelle, "text": x}
+            for _, l, t, w, h, x in fus]
+
+
+def corrige_ocr(t):
+    """Corrige les confusions de lecture courantes dans les numéros et les montants."""
+    t = t.replace("’", "'").replace("‘", "'").replace("`", "'").replace("´", "'").replace("°", "'").replace("''", "'")
+    if re.fullmatch(r"[§$]\d[\d'.,]*", t):  # « §5'971.25 » pour « 55'971.25 »
+        t = "5" + t[1:]
+    if re.match(r"^[§$S]\d{2}\.\d{4}", t):  # « §12.3123 » pour « 512.3123 »
+        t = "5" + t[1:]
+    t = re.sub(r"(\d)[:/](\d\d)$", r"\1.\2", t)  # « 32'753:55 », « 3323/55 »
+    if re.fullmatch(r"[-(]?[\dOoIl'.,]+\)?", t) and re.search(r"\d", t):
+        t = t.replace("O", "0").replace("o", "0").replace("I", "1").replace("l", "1")
+    return t
+
+
+def colonnes_document(pages):
+    """Bords droits des six colonnes de montants, déduits de la position des montants (pages sans en-tête lisible)."""
+    xs = Counter()
+    for _, _, mots in pages:
+        if sum(1 for w in mots if CODE.match(w["text"])) < 5:
+            continue
+        for w in mots:
+            if NUM.match(w["text"]) and ("'" in w["text"] or "." in w["text"]):
+                xs[round(w["x1"] / 3)] += 1
+    pics = []
+    for b, n in xs.most_common():
+        if all(abs(b - p) * 3 > 25 for p in pics):
+            pics.append(b)
+        if len(pics) == 6:
+            break
+    return sorted(p * 3 for p in pics)
 
 
 def lignes_de(mots, tol=2.5):
@@ -111,24 +155,44 @@ def libelles_colonnes(mots, ht, cols):
     return res
 
 
+def page_detail(mots):
+    """Une page de détail a l'en-tête « Charges Revenus » (trois fois) et plusieurs numéros de compte."""
+    return bool(entetes(mots)[1]) and any(CODE.match(w["text"]) for w in mots)
+
+
 def extraire_detail(doc, chemin):
-    pages = mots_pdf(chemin)
-    marque = re.compile(r"par\s+Direction\s*-\s*d")
-    detail = [i for i, (_, _, ms) in enumerate(pages)
-              if marque.search(" ".join(w["text"] for w in ms[:40]))]
+    pages = mots_pdf(chemin, doc.get("planches", False))
+    if doc.get("ocr"):  # document scanné : toutes les pages passent par la reconnaissance de caractères
+        pages = [(w, h, mots_ocr(chemin, doc["id"], i + 1, w)) for i, (w, h, _) in enumerate(pages)]
+    if doc.get("ocr"):
+        n = [sum(1 for w in ms if CODE.match(w["text"])) for _, _, ms in pages]
+        pleines = [i for i, k in enumerate(n) if k >= 5]
+        detail = [i for i, k in enumerate(n) if k >= 1 and pleines and pleines[0] <= i <= pleines[-1] + 1]
+        cols_doc = colonnes_document(pages)
+    else:
+        detail = [i for i, (_, _, ms) in enumerate(pages) if page_detail(ms)]
+        cols_doc = None
     if not detail:
         sys.exit(f"{doc['id']} : annexe 12 introuvable")
     premiere, derniere = detail[0], detail[-1]
     lignes_out = []
+    section_cour = None
     libelles = None
     cols_ref = None
     for i in range(premiere, derniere + 1):
         w, hgt, mots = pages[i]
-        source = "texte"
-        if len(mots) < 5:  # page enregistrée sans texte
+        source = "ocr" if doc.get("ocr") else "texte"
+        if len(mots) < 5 and source == "texte":  # page enregistrée sans texte
             mots = mots_ocr(chemin, doc["id"], i + 1, w)
             source = "ocr"
         ht, moities = entetes(mots)
+        if not moities and doc.get("ocr") and cols_ref:
+            ht, moities = 0, cols_ref
+        if not moities and doc.get("ocr") and cols_doc and len(cols_doc) == 6:
+            xc = sorted(w["x0"] for w in mots if CODE.match(w["text"]))
+            xm = xc[len(xc) // 2] if xc else 0
+            codes = [w["top"] for w in mots if re.match(r"^\d{1,4}(\.\d{3})?$", w["text"]) and abs(w["x0"] - xm) < 15]
+            ht, moities = (min(codes) - 6 if codes else 0), [cols_doc]
         if not moities:
             if source == "ocr" and cols_ref:
                 ht, moities = 0, cols_ref
@@ -136,7 +200,7 @@ def extraire_detail(doc, chemin):
                 continue
         if source == "texte":
             cols_ref = None
-        lab = libelles_colonnes(mots, ht, moities[0]) if source == "texte" else None
+        lab = libelles_colonnes(mots, ht, moities[0]) if (source == "texte" or doc.get("ocr")) and moities else None
         if lab and libelles is None:
             libelles = lab
         bornes = [m[-1] + 30 for m in moities]
@@ -152,7 +216,7 @@ def extraire_detail(doc, chemin):
             x_code = None
             for top, ws in lignes_de(ms, tol=2.5 if source == "texte" else 4):
                 txt = " ".join(x["text"] for x in ws).strip()
-                if PIED.match(txt):
+                if PIED.match(txt) or ".indd" in txt or txt.startswith("|") or txt.startswith("Les comptes surlign"):
                     continue
                 premier = ws[0]["text"]
                 def col(x):
@@ -171,10 +235,18 @@ def extraire_detail(doc, chemin):
                     lignes_out[-1]["commentaire"] = (lignes_out[-1]["commentaire"] + " " + txt).strip()
                     continue
                 if CODE.match(premier):
-                    c = premier.replace(".", "")
-                    typ, code = "compte", c[:4] + "." + c[4:]
+                    if re.match(r"^\d{3}\.", premier):
+                        typ, code = "compte", premier  # ancienne numérotation, convertie à la fusion
+                    else:
+                        c = premier.replace(".", "")
+                        typ, code = "compte", c[:4] + "." + c[4:]
                     x_code = ws[0]["x0"]
-                elif re.match(r"^\d{4}$", premier) and (nums or libelle.isupper()):
+                elif x_code is not None and ws[0]["x0"] > x_code + 15 and not nums:
+                    # texte décalé dans la colonne des libellés : commentaire (même s'il commence par un nombre)
+                    if lignes_out and lignes_out[-1]["type"] == "compte":
+                        lignes_out[-1]["commentaire"] = (lignes_out[-1]["commentaire"] + " " + txt).strip()
+                    continue
+                elif re.match(r"^\d{3,4}$", premier) and (nums or libelle.isupper()):
                     typ, code = "section", premier
                 elif re.match(r"^\d{2}$", premier) and (nums or libelle.isupper()):
                     typ, code = "groupe", premier
@@ -189,10 +261,14 @@ def extraire_detail(doc, chemin):
                     continue
                 else:
                     continue
-                lignes_out.append({"document": doc["id"], "page": i + 1, "source": source, "type": typ,
+                if typ == "section":
+                    section_cour = code
+                sec_ligne = code.split(".")[0] if (typ == "compte" and re.match(r"^\d{3}\.", code)) else \
+                    (section_cour if typ == "compte" else "")
+                lignes_out.append({"document": doc["id"], "page": i + 1, "source": source, "type": typ, "section": sec_ligne,
                                    "code": code, "libelle": libelle, "commentaire": "",
                                    **{f"v{j}": ("" if v is None else f"{v:.2f}") for j, v in enumerate(vals)}})
-        if source == "texte":
+        if source == "texte" or (doc.get("ocr") and entetes(mots)[1]):
             cols_ref = moities
     return lignes_out, libelles
 
@@ -227,7 +303,25 @@ def extraire_annexes(chemin):
     return res
 
 
-CHAMPS = ["document", "page", "source", "type", "code", "libelle", "v0", "v1", "v2", "v3", "v4", "v5", "commentaire"]
+def appliquer_corrections(doc_id, lignes):
+    """Corrections manuelles documentées (sources/corrections.csv), pour les erreurs de lecture vérifiées sur l'image."""
+    chemin = os.path.join(SRC, "corrections.csv")
+    if not os.path.exists(chemin):
+        return 0
+    n = 0
+    for c in csv.DictReader(open(chemin, encoding="utf-8")):
+        if c["document"] != doc_id:
+            continue
+        cible = [l for l in lignes if l["type"] == c["type"] and l["code"] == c["code"]
+                 and (c["type"] != "compte" or l["section"] == c["section"])]
+        if len(cible) != 1:
+            sys.exit(f"Correction introuvable ou ambiguë : {c}")
+        cible[0][c["colonne"]] = f"{float(c['valeur']):.2f}"
+        n += 1
+    return n
+
+
+CHAMPS = ["document", "page", "source", "type", "section", "code", "libelle", "v0", "v1", "v2", "v3", "v4", "v5", "commentaire"]
 
 
 def main():
@@ -246,9 +340,19 @@ def main():
         attendu = [("Budget " if c.split(":")[0] in ("projet", "budget") else "Comptes ") + c.split(":")[1]
                    for c in doc["colonnes"]]
         if libelles != attendu:
-            sys.exit(f"{doc['id']} : colonnes {libelles}, attendu {attendu} (voir documents.json)")
-        annexes = extraire_annexes(chemin)
+            if doc.get("ocr") and libelles is None:
+                print(f"{doc['id']} : en-têtes de colonnes non lus par OCR, colonnes de documents.json utilisées")
+            else:
+                sys.exit(f"{doc['id']} : colonnes {libelles}, attendu {attendu} (voir documents.json)")
+        annexes = extraire_annexes(chemin) if not doc.get("ocr") else {"totaux": {}, "natures": {}, "natures_montants": {}, "directions": {}}
+        if doc.get("totaux_officiels"):  # totaux relevés à la main dans le document (formats anciens)
+            t = doc["totaux_officiels"]
+            annexes["totaux"] = {sens: [t[c][k] if c in t else None for c in doc["colonnes"]]
+                                 for k, sens in enumerate(("charges", "revenus"))}
         annexes["colonnes"] = doc["colonnes"]
+        n_corr = appliquer_corrections(doc["id"], lignes)
+        if n_corr:
+            print(f"{doc['id']} : {n_corr} corrections manuelles appliquées (sources/corrections.csv)")
         with open(os.path.join(SRC, "extraits", doc["id"] + ".csv"), "w", newline="", encoding="utf-8") as f:
             wr = csv.DictWriter(f, fieldnames=CHAMPS)
             wr.writeheader()
